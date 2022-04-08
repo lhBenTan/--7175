@@ -42,7 +42,7 @@
                 </ComboBox>
             </Grid>
 
-            <hc:Divider></hc:Divider>
+            <hc:Divider Content="参数"/>
 
             <local:_7175_Alg_1>
                 <local:_7175_Alg_1.Visibility>

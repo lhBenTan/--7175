@@ -22,7 +22,7 @@ namespace 滤光片点胶
             HiKhelper.Search();
 
             SeletedCam = 0;
-            camParamViewModel = MultiView.DictPanel[0].camera;
+            camParamViewModel = MultiView.DictPanel[0].CamVM;
             IsCamOn = new ObservableCollection<bool>();
 
             int i = 0;
@@ -33,7 +33,7 @@ namespace 滤光片点胶
             {
                 IsCamOn.Add(false);
                 item.Init("./Para/Cam"+i.ToString());
-                item.camera.MV_OnSendMess += SY_MV_OnSendMsg;
+                item.CamVM.MV_OnSendMess += SY_MV_OnSendMsg;
                 i++;
             }
             IsCamOn.Add(false);
@@ -68,7 +68,7 @@ namespace 滤光片点胶
             {
                 if (value >= 0)
                 {
-                    camParamViewModel = MultiView.DictPanel[SeletedCam].camera;
+                    camParamViewModel = MultiView.DictPanel[SeletedCam].CamVM;
                 }
             });
         }
@@ -119,7 +119,7 @@ namespace 滤光片点胶
         [AsyncCommand]
         public void ModeSwitchCommand(object obj)
         {
-            camParamViewModel.camera.TriggerMode();
+            camParamViewModel.HiKCamera.TriggerMode();
         }
 
         /// <summary>
@@ -133,8 +133,8 @@ namespace 滤光片点胶
 
             for (int i = 0; i < MultiView.DictPanel.Count; i++)
             {
-                MultiView.DictPanel[i].camera.Connect();
-                if (MultiView.DictPanel[i].camera.camera.isConnect)
+                MultiView.DictPanel[i].CamVM.Connect();
+                if (MultiView.DictPanel[i].CamVM.HiKCamera.isConnect)
                 {
                     IsCamOn[i] = true;
                     //MultiView.DictPanel[i].camera.camera.TriggerMode();
@@ -157,8 +157,8 @@ namespace 滤光片点胶
 
             for (int i = 0; i < MultiView.DictPanel.Count; i++)
             {
-                MultiView.DictPanel[i].camera.Disconnect();
-                if (!MultiView.DictPanel[i].camera.camera.isConnect)
+                MultiView.DictPanel[i].CamVM.Disconnect();
+                if (!MultiView.DictPanel[i].CamVM.HiKCamera.isConnect)
                 {
                     IsCamOn[i] = false;
                 }
@@ -229,8 +229,8 @@ namespace 滤光片点胶
         {
             for (int i = 0; i < MultiView.DictPanel.Count; i++)
             {
-                MultiView.DictPanel[i].camera.Disconnect();
-                if (!MultiView.DictPanel[i].camera.camera.isConnect)
+                MultiView.DictPanel[i].CamVM.Disconnect();
+                if (!MultiView.DictPanel[i].CamVM.HiKCamera.isConnect)
                 {
                     IsCamOn[i] = false;
                 }
@@ -267,11 +267,11 @@ namespace 滤光片点胶
             switch (str[0])
             {
                 case 'M':
-                    nRet = MultiView.DictPanel[0].camera.camera.device.MV_CC_SetCommandValue_NET("TriggerSoftware"); break;
+                    nRet = MultiView.DictPanel[0].CamVM.HiKCamera.TriggerOnce(); break;
                 case 'm':
-                    nRet = MultiView.DictPanel[1].camera.camera.device.MV_CC_SetCommandValue_NET("TriggerSoftware"); break;
+                    nRet = MultiView.DictPanel[1].CamVM.HiKCamera.TriggerOnce(); break;
                 //case '3':
-                //    nRet = MultiView.DictPanel[2].camera.camera.device.MV_CC_SetCommandValue_NET("TriggerSoftware"); break;
+                //    nRet = MultiView.DictPanel[2].CamVM.HiKCamera.TriggerOnce(); break;
                 default:
                     break;
             }

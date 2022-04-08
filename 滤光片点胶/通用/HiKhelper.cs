@@ -11,50 +11,54 @@ using HandyControl.Controls;
 
 namespace 滤光片点胶
 {
+    /// <summary>
+    /// 海康相机
+    /// </summary>
     public class HiKhelper : DispatcherObject
     {
+        #region 析构函数
+
         ~HiKhelper()
         {
+            ///软件退出前断开相机
             if (isConnect == true)
             {
                 Disconnect();
             }
         }
 
+        #endregion
+        
+        #region 私有参数
+
         /// <summary>
         /// 海康实例
         /// </summary>
-        public MyCamera device = new MyCamera();
+        private MyCamera device = new MyCamera();
 
         /// <summary>
-        /// 判断相机是否连接成功 true表示相机连接成功
+        /// 设备列表
         /// </summary>
-        public bool isConnect = false;
+        private static MyCamera.MV_CC_DEVICE_INFO_LIST stDevList;
 
         /// <summary>
-        /// 判断相机是否处于触发模式 true表示处于触发模式
+        /// 
         /// </summary>
-        public bool isTrigger = false;
+        private byte[] buf;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private IntPtr pBuf;
+
+        #endregion
+
+        #region 搜索相机
 
         /// <summary>
         /// 相机通讯方式
         /// </summary>
         static uint nTLayerType = MyCamera.MV_GIGE_DEVICE | MyCamera.MV_USB_DEVICE;
-
-        /// <summary>
-        /// 设备列表
-        /// </summary>
-        static MyCamera.MV_CC_DEVICE_INFO_LIST stDevList;
-
-        /// <summary>
-        /// 回调函数
-        /// </summary>
-        MyCamera.cbOutputExdelegate pCallBackFunc;
-
-        /// <summary>
-        /// 错误信息
-        /// </summary>
-        public string err = "";
 
         /// <summary>
         /// 相机信息，用于下拉框显示
@@ -134,10 +138,33 @@ namespace 滤光片点胶
             }
         }
 
+        #endregion
+
+        #region 相机状态
+
+        /// <summary>
+        /// 判断相机是否连接成功 true表示相机连接成功
+        /// </summary>
+        public bool isConnect = false;
+
+        /// <summary>
+        /// 判断相机是否处于触发模式 true表示处于触发模式
+        /// </summary>
+        public bool isTrigger = false;
+
+        /// <summary>
+        /// 错误信息
+        /// </summary>
+        public string err = "";
+
+        #endregion
+
+        #region 相机操作
+
         /// <summary>
         /// 海康相机连接 连接后默认进入外部触发模式(软触发)
         /// </summary>
-        /// <returns></returns>
+        /// <returns>错误码</returns>
         public int Connect(int n)
         {
             if (isConnect)
@@ -260,7 +287,7 @@ namespace 滤光片点胶
 
             MyCamera.MVCC_ENUMVALUE mode = new MyCamera.MVCC_ENUMVALUE();
             device.MV_CC_GetTriggerMode_NET(ref mode);
-            
+
             nRet += device.MV_CC_SetEnumValue_NET("TriggerMode", (uint)(1 - mode.nCurValue));
 
             if (MyCamera.MV_OK != nRet)
@@ -272,8 +299,31 @@ namespace 滤光片点胶
             isTrigger = !isTrigger;
         }
 
+        /// <summary>
+        /// 触发一次拍照
+        /// </summary>
+        public int TriggerOnce()
+        {
+            return device.MV_CC_SetCommandValue_NET("TriggerSoftware");
+        }
 
-        #region 暂放置
+        #endregion
+
+        #region 外部设置
+
+        /// <summary>
+        /// 路由事件，回调原始帧
+        /// </summary>
+        public event EventHandler<MV_IM_INFO> MV_OnOriFrameInvoked;
+
+        #endregion
+
+        #region 回调函数
+
+        /// <summary>
+        /// 回调函数
+        /// </summary>
+        MyCamera.cbOutputExdelegate pCallBackFunc;
 
         /// <summary>
         /// 图像结构体
@@ -288,11 +338,6 @@ namespace 滤光片点胶
             public int nFrameLen;
 
         }
-
-        /// <summary>
-        /// 路由事件，回调原始帧
-        /// </summary>
-        public event EventHandler<MV_IM_INFO> MV_OnOriFrameInvoked;
 
         /// <summary>
         /// 外部委托
@@ -343,8 +388,7 @@ namespace 滤光片点胶
             }
         }
 
-        private byte[] buf;
-        private IntPtr pBuf;
+        
         #endregion
         
     }

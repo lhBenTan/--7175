@@ -25,11 +25,7 @@ namespace 滤光片点胶
         public MainWindow()
         {
             InitializeComponent();
-
-
-           
-
-
+            
             Loaded += (s, e) =>
             {
                 grid.Tag = 1;

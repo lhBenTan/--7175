@@ -21,7 +21,7 @@ namespace 滤光片点胶
         /// <summary>
         /// 相机信息
         /// </summary>
-        public HiKhelper camera = new HiKhelper();
+        public HiKhelper HiKCamera = new HiKhelper();
 
         /// <summary>
         /// /构造函数
@@ -30,7 +30,7 @@ namespace 滤光片点胶
         {
             camInfos = HiKhelper.CamInfos;
             stp = new SmartThreadPool { MaxThreads = 1 };
-            camera.MV_OnOriFrameInvoked += Hik_MV_OnOriFrameInvoked;
+            HiKCamera.MV_OnOriFrameInvoked += Hik_MV_OnOriFrameInvoked;
             
             ImSrc_test = new WriteableBitmap(new BitmapImage(new Uri(@"./图片/null.png", UriKind.Relative))); ;
         }
@@ -89,12 +89,12 @@ namespace 滤光片点胶
 
         public void Connect()
         {
-            camera.Connect(SelectedCam);
+            HiKCamera.Connect(SelectedCam);
         }
 
         public void Disconnect()
         {
-            camera.Disconnect();
+            HiKCamera.Disconnect();
         }
 
         #endregion
@@ -156,7 +156,7 @@ namespace 滤光片点胶
             CVAlgorithms.MV_EntryPoint(SelectedAlg, ref bmpBuf, inParam, ref outParam[0]);
 
 
-            if (camera.isTrigger)
+            if (HiKCamera.isTrigger)
             {
                 if (outParam[0] == 1)
                 {

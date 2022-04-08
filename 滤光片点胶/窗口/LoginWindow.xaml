@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         WindowStyle="ToolWindow"
+        Topmost="True"
         Title="登录" 
         Height="220" 
         Width="380">
@@ -26,7 +27,6 @@
 
         <TextBlock Text="账户" Grid.Column="1" Grid.Row="1" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
         <TextBox Name="un" Text="admin" Grid.Column="2" Grid.Row="1" FontSize="15" TextAlignment="Left" VerticalAlignment="Center" Margin="2" />
-
 
         <TextBlock Text="密码" Grid.Column="1" Grid.Row="2" FontSize="20" TextAlignment="Left" HorizontalAlignment="Center" VerticalAlignment="Center" />
         <PasswordBox Name="pw" Grid.Column="2" Grid.Row="2" FontSize="20" VerticalAlignment="Center" Margin="2"/>

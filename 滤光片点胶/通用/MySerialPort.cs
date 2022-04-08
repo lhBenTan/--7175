@@ -18,7 +18,16 @@ namespace 滤光片点胶
 {
     public class MySerialPort : ViewModelBase
     {
+        #region 串口状态
+
+        /// <summary>
+        /// 串口状态 true表示在线
+        /// </summary>
         private bool close = false;
+
+        #endregion
+
+        #region 控制台打印
 
         /// <summary>
         /// 界面显示
@@ -26,42 +35,51 @@ namespace 滤光片点胶
         public static TextBlock OriginalTextBlock = null;
 
         /// <summary>
-        /// 首标
+        /// 打印一条信息到界面
         /// </summary>
-        public string CmdTag => "[" + DateTime.Now.ToString("MM/dd") + " " + DateTime.Now.ToLongTimeString() + "]";
+        /// <param name="str"></param>
+        public void WriteLine(string str, string color = "white")
+        {
+            Application.Current.Dispatcher.Invoke(new Action(() =>
+            {
+                try
+                {
+                    Run run = new Run(CmdTag + str + "\r");
+
+                    switch (color)
+                    {
+                        case "Blue": run.Foreground = new SolidColorBrush(Colors.Blue); break;
+                        case "Green": run.Foreground = new SolidColorBrush(Colors.Green); break;
+                        case "Red": run.Foreground = new SolidColorBrush(Colors.Red); break;
+                        default:
+                            run.Foreground = new SolidColorBrush(Colors.White); break;
+                    }
+
+                    OriginalTextBlock.Inlines.Add(run);
+
+                    (OriginalTextBlock.Parent as System.Windows.Controls.ScrollViewer).ScrollToEnd();
+                    while (OriginalTextBlock.Inlines.Count > 10)
+                        OriginalTextBlock.Inlines.Remove(OriginalTextBlock.Inlines.ElementAt(1));
+                }
+                catch
+                {
+                    Growl.Error("控制台输出失败");
+                }
+            }));
+        }
+
+        #endregion
+
+        #region 外部设置
 
         /// <summary>
-        /// 串口实例
-        /// </summary>
-        public SerialPort serialPort;
-
-        /// <summary>
-        /// 事件
+        /// 通讯事件 将收到的信息外发解析
         /// </summary>
         public event EventHandler<string> MV_Mess;
 
-        /// <summary>
-        /// 信息队列
-        /// </summary>
-        Queue<string> Mess = new Queue<string>();
+        #endregion
 
-        SerialDataReceivedEventHandler handler;
-
-        /// <summary>
-        /// 信息接收
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            if (close) return;
-
-            byte[] readBuffer = new byte[serialPort.ReadBufferSize];
-            serialPort.Read(readBuffer, 0, readBuffer.Length);
-            string str = Encoding.Default.GetString(readBuffer);
-
-            MV_Mess?.Invoke(this, str);
-        }
+        #region 初始化
 
         /// <summary>
         /// 新建配置文件
@@ -141,8 +159,47 @@ namespace 滤光片点胶
                 InitErr();
             }
 
-            
+
         }
+
+        #endregion
+
+        #region 回调函数
+
+        /// <summary>
+        /// 事件句柄
+        /// </summary>
+        SerialDataReceivedEventHandler handler;
+
+        /// <summary>
+        /// 信息接收
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            if (close) return;
+
+            byte[] readBuffer = new byte[serialPort.ReadBufferSize];
+            serialPort.Read(readBuffer, 0, readBuffer.Length);
+            string str = Encoding.Default.GetString(readBuffer);
+
+            MV_Mess?.Invoke(this, str);
+        }
+
+        #endregion
+        
+        #region 本地参数
+        /// <summary>
+        /// 首标
+        /// </summary>
+        public string CmdTag => "[" + DateTime.Now.ToString("MM/dd") + " " + DateTime.Now.ToLongTimeString() + "]";
+
+        /// <summary>
+        /// 串口实例
+        /// </summary>
+        private SerialPort serialPort;
+        #endregion
 
         #region 构造/析构 函数
 
@@ -181,39 +238,7 @@ namespace 滤光片点胶
         
         #region 外调函数
         
-        /// <summary>
-        /// 打印一条信息到界面
-        /// </summary>
-        /// <param name="str"></param>
-        public void WriteLine(string str,string color = "white")
-        {
-            Application.Current.Dispatcher.Invoke(new Action(() => 
-            {
-                try
-                {
-                    Run run = new Run(CmdTag + str + "\r");
-
-                    switch (color)
-                    {
-                        case "Blue": run.Foreground = new SolidColorBrush(Colors.Blue); break;
-                        case "Green": run.Foreground = new SolidColorBrush(Colors.Green); break;
-                        case "Red": run.Foreground = new SolidColorBrush(Colors.Red); break;
-                        default:
-                            run.Foreground = new SolidColorBrush(Colors.White); break;
-                    }
-
-                    OriginalTextBlock.Inlines.Add(run);
-
-                    (OriginalTextBlock.Parent as System.Windows.Controls.ScrollViewer).ScrollToEnd();
-                    while (OriginalTextBlock.Inlines.Count > 10)
-                        OriginalTextBlock.Inlines.Remove(OriginalTextBlock.Inlines.ElementAt(1));
-                }
-                catch
-                {
-                    Growl.Error("控制台输出失败");
-                }
-            }));
-        }
+        
 
         /// <summary>
         /// 发送一条信息
@@ -475,7 +500,6 @@ namespace 滤光片点胶
             get => GetProperty(() => NG_Ret);
             set => SetProperty(() => NG_Ret, value);
         }
-#endif
 
         /// <summary>
         /// 控制台文本显示
@@ -485,6 +509,7 @@ namespace 滤光片点胶
             get => GetProperty(() => console);
             set => SetProperty(() => console, value);
         }
+#endif
         #endregion
 
     }

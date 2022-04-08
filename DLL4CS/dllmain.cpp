@@ -45,8 +45,8 @@ void DirtyTestG1R1(BmpBuf &data, char** input_Parameter, float* output_Parameter
 	
 	str << "G1R1" << endl;
 
-	//src = Mat(data.h, data.w, CV_8UC1, data.data_Input);//
-	src = imread("C:\\Users\\Administrator\\Desktop\\7175\\外观\\G1R1\\0324\\8.bmp", 0);
+	src = Mat(data.h, data.w, CV_8UC1, data.data_Input);//
+	//src = imread("C:\\Users\\Administrator\\Desktop\\7175\\外观\\G1R1\\0324\\8.bmp", 0);
 #pragma endregion
 
 #pragma region 参数载入
@@ -67,7 +67,7 @@ void DirtyTestG1R1(BmpBuf &data, char** input_Parameter, float* output_Parameter
 	int  D1AdapSize = atoi(input_Parameter[10]);	//脏污1-强度
 	D1AdapSize = D1AdapSize * 2 + 1;
 	int  D1AdapC = atoi(input_Parameter[11]);		//脏污1-容差
-	float DoR = atof(input_Parameter[12]);		//脏污1-圆度上限 0-1
+	float DoR = (float)atof(input_Parameter[12]);		//脏污1-圆度上限 0-1
 	int D1SizeMax = atoi(input_Parameter[14]);	//脏污1-面积上限
 	int D1SizeMin = atoi(input_Parameter[15]);		//脏污1-面积下限
 #pragma endregion
@@ -198,9 +198,9 @@ void DirtyTestG1R1(BmpBuf &data, char** input_Parameter, float* output_Parameter
 		{
 			RotatedRect box = minAreaRect(contours[i]);
 
-			float area = contourArea(contours[i]);
-			float len = arcLength(contours[i], 1);
-			float roundness = (4 * CV_PI*area) / (len*len);
+			double area = contourArea(contours[i]);
+			double len = arcLength(contours[i], 1);
+			double roundness = (4 * CV_PI*area) / (len*len);
 
 			float w = box.size.width;
 			float h = box.size.height;
@@ -247,7 +247,7 @@ void DirtyTestG1R1(BmpBuf &data, char** input_Parameter, float* output_Parameter
 		morphologyEx(show, show, MORPH_OPEN, kernel);
 
 		num = connectedComponentsWithStats(show, labels, stats, centroids);
-		for (size_t i = 0; i < num; i++)
+		for (int i = 0; i < num; i++)
 		{
 			int x = stats.at<int>(i, CC_STAT_LEFT);
 			int y = stats.at<int>(i, CC_STAT_TOP);
@@ -285,7 +285,7 @@ void DirtyTestG1R1(BmpBuf &data, char** input_Parameter, float* output_Parameter
 #pragma region 文字输入
 	//字体大小
 	int text_Size;
-	text_Size = ((data.w* data.h / 10000 - 30) * 0.078 + 25) * 2;
+	text_Size = (int)((data.w* data.h / 10000 - 30) * 0.078 + 25) * 2;
 	//位置
 	Point text_Localtion01;
 	text_Localtion01.x = text_Size / 3;
@@ -306,8 +306,8 @@ void DirtyTestG1R1(BmpBuf &data, char** input_Parameter, float* output_Parameter
 
 #pragma region 结果返回
 	output_Parameter_Float[0] = flag;
-	output_Parameter_Float[1] = err1;
-	output_Parameter_Float[2] = err2;
+	output_Parameter_Float[1] = (float)err1;
+	output_Parameter_Float[2] = (float)err2;
 #pragma endregion
 
 #pragma region 图片返回
@@ -333,8 +333,8 @@ void DirtyTestP2R1(BmpBuf &data, char** input_Parameter, float* output_Parameter
 	Mat	src, dst, temp, labels, stats, centroids, toBlur, Polared, Blured, Diff, show, DePolared, mask, ROI, kernel;
 	
 	str << "P2R1" << endl;
-	//src = Mat(data.h, data.w, CV_8UC1, data.data_Input);//默认判胶相机使用的是彩色相机
-	src = imread("C:\\Users\\Administrator\\Desktop\\7175\\外观\\P2R1\\0325\\2\\26.bmp", 0);
+	src = Mat(data.h, data.w, CV_8UC1, data.data_Input);//默认判胶相机使用的是彩色相机
+	//src = imread("C:\\Users\\Administrator\\Desktop\\7175\\外观\\P2R1\\0325\\2\\26.bmp", 0);
 	cvtColor(src, dst, COLOR_GRAY2RGB);
 #pragma endregion
 
@@ -360,8 +360,8 @@ void DirtyTestP2R1(BmpBuf &data, char** input_Parameter, float* output_Parameter
 	int AdapSize = atoi(input_Parameter[10]);			//脏污2-强度
 	AdapSize = AdapSize * 2 + 1;
 	int AdapC = atoi(input_Parameter[11]);				//脏污2-容差
-	float RoundnessMin = atof(input_Parameter[12]);		//脏污2-圆度下限
-	float RectangularityMin = atof(input_Parameter[13]);//脏污2-矩形度下限
+	double RoundnessMin = atof(input_Parameter[12]);		//脏污2-圆度下限
+	double RectangularityMin = atof(input_Parameter[13]);//脏污2-矩形度下限
 	int D2sizeMax = atoi(input_Parameter[14]);			//脏污2-最大面积
 	int D2sizeMin = atoi(input_Parameter[15]);			//脏污2-最小面积
 #pragma endregion
@@ -431,7 +431,7 @@ void DirtyTestP2R1(BmpBuf &data, char** input_Parameter, float* output_Parameter
 		}
 
 		num = connectedComponentsWithStats(show, labels, stats, centroids);
-		for (size_t i = 0; i < num; i++)
+		for (int i = 0; i < num; i++)
 		{
 			int x = stats.at<int>(i, CC_STAT_LEFT);
 			int y = stats.at<int>(i, CC_STAT_TOP);
@@ -465,16 +465,16 @@ void DirtyTestP2R1(BmpBuf &data, char** input_Parameter, float* output_Parameter
 		{
 			RotatedRect box = minAreaRect(contours[i]);
 
-			float area = contourArea(contours[i]);
-			float len = arcLength(contours[i], 1);
-			float Roundness = (4 * CV_PI*area) / (len*len);
+			double area = contourArea(contours[i]);
+			double len = arcLength(contours[i], 1);
+			double Roundness = (4 * CV_PI*area) / (len*len);
 
 			float w = box.size.width;
 			float h = box.size.height;
 			float a = box.size.area();
 
 			float minrectArea = w * h;
-			float Rectangularity;
+			double Rectangularity;
 			if (minrectArea == 0)
 			{
 				Rectangularity = 0;
@@ -525,8 +525,7 @@ void DirtyTestP2R1(BmpBuf &data, char** input_Parameter, float* output_Parameter
 
 #pragma region 文字输入
 	//字体大小
-	int text_Size;
-	text_Size = ((data.w* data.h / 10000 - 30) * 0.078 + 25) * 2;
+	int text_Size = (int)((data.w* data.h / 10000 - 30) * 0.078 + 25) * 2;
 	//位置
 	Point text_Localtion01;
 	text_Localtion01.x = text_Size / 3;
@@ -547,8 +546,8 @@ void DirtyTestP2R1(BmpBuf &data, char** input_Parameter, float* output_Parameter
 
 #pragma region 结果返回
 	output_Parameter_Float[0] = flag;
-	output_Parameter_Float[1] = err1;
-	output_Parameter_Float[2] = err2;
+	output_Parameter_Float[1] = (float)err1;
+	output_Parameter_Float[2] = (float)err2;
 #pragma endregion
 
 #pragma region 图片返回
@@ -573,8 +572,7 @@ void ErrOutput(BmpBuf &data, char** input_Parameter, float* output_Parameter_Flo
 
 #pragma region 文字输入
 	//字体大小
-	int text_Size;
-	text_Size = ((data.w* data.h / 10000 - 30) * 0.078 + 25) * 2;
+	int text_Size = (int)((data.w* data.h / 10000 - 30) * 0.078 + 25) * 2;
 	//位置
 	Point text_Localtion01;
 	text_Localtion01.x = text_Size / 3;
