@@ -18,6 +18,14 @@ namespace 滤光片点胶
     {
         #region 析构函数
 
+        public HiKhelper()
+        {
+            isTrigger = false;
+
+            isOK = true;
+            isNG = false;
+        }
+
         ~HiKhelper()
         {
             ///软件退出前断开相机
@@ -150,12 +158,16 @@ namespace 滤光片点胶
         /// <summary>
         /// 判断相机是否处于触发模式 true表示处于触发模式
         /// </summary>
-        public bool isTrigger = false;
+        public bool isTrigger { set; get; }
 
         /// <summary>
         /// 错误信息
         /// </summary>
         public string err = "";
+
+        public bool isOK { set; get; }
+
+        public bool isNG { set; get; }
 
         #endregion
 
@@ -228,11 +240,11 @@ namespace 滤光片点胶
                 return nRet;
             }
 
-            //软触发
+            ////软触发
             nRet += device.MV_CC_SetEnumValue_NET("TriggerMode", (uint)1);
             nRet += device.MV_CC_SetEnumValue_NET("TriggerSource", 7);
-            nRet += device.MV_CC_SetBoolValue_NET("TriggerCacheEnable", true);
-            nRet += device.MV_CC_SetFloatValue_NET("AcquisitionFrameRate", (float)2);
+            //nRet += device.MV_CC_SetBoolValue_NET("TriggerCacheEnable", true);
+            //nRet += device.MV_CC_SetFloatValue_NET("AcquisitionFrameRate", (float)2);
             nRet += device.MV_CC_SetIntValue_NET("GevHeartbeatTimeout", (uint)500);//心跳时间
             if (MyCamera.MV_OK != nRet)
             {
@@ -275,6 +287,7 @@ namespace 滤光片点胶
                 return nRet;
             }
             isConnect = false;
+            isTrigger = false;
             return nRet;
         }
 
@@ -296,7 +309,11 @@ namespace 滤光片点胶
 
                 Growl.Error(err);
             }
-            isTrigger = !isTrigger;
+            else
+            {
+                isTrigger = !isTrigger;
+            }
+            
         }
 
         /// <summary>

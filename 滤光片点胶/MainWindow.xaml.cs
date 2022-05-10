@@ -22,6 +22,7 @@ namespace 滤光片点胶
     {
         MainViewModel MainVM;
 
+        
         public MainWindow()
         {
             InitializeComponent();
@@ -29,8 +30,8 @@ namespace 滤光片点胶
             Loaded += (s, e) =>
             {
                 grid.Tag = 1;
-                MultiView.InitGrid(grid, 2);
-                MultiView.SetCurrentModel(2);
+                MultiView.InitGrid(grid, 3);
+                MultiView.SetCurrentModel(3);
 
                 Run run = new Run("[控制台输出]\n");
                 Console.Inlines.Add(run);

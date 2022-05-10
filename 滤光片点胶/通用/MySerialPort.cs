@@ -193,7 +193,7 @@ namespace 滤光片点胶
         /// <summary>
         /// 首标
         /// </summary>
-        public string CmdTag => "[" + DateTime.Now.ToString("MM/dd") + " " + DateTime.Now.ToLongTimeString() + "]";
+        public string CmdTag => "[" + DateTime.Now.ToString("MM/dd") + " " + DateTime.Now.ToString("HH:mm:ss:ff") + "]";
 
         /// <summary>
         /// 串口实例

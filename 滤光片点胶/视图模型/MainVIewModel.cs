@@ -15,6 +15,12 @@ namespace 滤光片点胶
     public class MainViewModel:ViewModelBase
     {
         /// <summary>
+        /// 路由事件，回调原始帧
+        /// </summary>
+        public event EventHandler<string> MV_OnSendMess;
+        //delegate void bbb(object sender, string str);
+        
+        /// <summary>
         /// 构造函数
         /// </summary>
         public MainViewModel()
@@ -45,6 +51,9 @@ namespace 滤光片点胶
             }
 
             Version = Application.ResourceAssembly.GetName().Version.ToString();
+
+
+            MV_OnSendMess?.Invoke(this , "");
         }
 
         #region 绑定参数
@@ -120,6 +129,7 @@ namespace 滤光片点胶
         public void ModeSwitchCommand(object obj)
         {
             camParamViewModel.HiKCamera.TriggerMode();
+            IsCamOn[SeletedCam] = camParamViewModel.HiKCamera.isTrigger;
         }
 
         /// <summary>
@@ -266,12 +276,30 @@ namespace 滤光片点胶
             int nRet = 0;
             switch (str[0])
             {
-                case 'M':
+                case 'A':
                     nRet = MultiView.DictPanel[0].CamVM.HiKCamera.TriggerOnce(); break;
-                case 'm':
+                case 'B':
                     nRet = MultiView.DictPanel[1].CamVM.HiKCamera.TriggerOnce(); break;
-                //case '3':
-                //    nRet = MultiView.DictPanel[2].CamVM.HiKCamera.TriggerOnce(); break;
+                case 'C':
+                    nRet = MultiView.DictPanel[2].CamVM.HiKCamera.TriggerOnce(); break;
+                case 'D':
+                    {
+                        float[] data = OffsetRotate.Rotate();
+
+                        string _str = "";
+                        _str += "T";
+                        _str += string.Format("{0:000}", data[0]);
+                        int num = (int)data[1];
+                        if (num >= 0) str += "+";
+                        _str += string.Format("{0:0000}", data[1]);
+                        num = (int)data[2];
+                        if (num >= 0) str += "+";
+                        _str += string.Format("{0:0000}", data[2]);
+
+                        MV_OnSendMess?.Invoke(this, _str);
+
+                    }
+                    break;
                 default:
                     break;
             }

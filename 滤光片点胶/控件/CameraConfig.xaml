@@ -39,6 +39,8 @@
                           SelectedIndex="{Binding camParamViewModel.SelectedAlg, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" >
                     <ComboBoxItem Content="识别算法1" />
                     <ComboBoxItem Content="识别算法2" />
+                    <ComboBoxItem Content="识别算法3 - 滤光片识别" />
+                    <ComboBoxItem Content="识别算法4 - 镜筒识别" />
                 </ComboBox>
             </Grid>
 
@@ -61,6 +63,24 @@
                     </MultiBinding>
                 </local:_7175_Alg_2.Visibility>
             </local:_7175_Alg_2>
+
+            <local:_7175_Alg_3>
+                <local:_7175_Alg_3.Visibility>
+                    <MultiBinding Converter="{StaticResource CACG_Conv}">
+                        <Binding Path="camParamViewModel.SelectedAlg" />
+                        <Binding Path="CommboxID[2]" />
+                    </MultiBinding>
+                </local:_7175_Alg_3.Visibility>
+            </local:_7175_Alg_3>
+
+            <local:_7175_Alg_4>
+                <local:_7175_Alg_4.Visibility>
+                    <MultiBinding Converter="{StaticResource CACG_Conv}">
+                        <Binding Path="camParamViewModel.SelectedAlg" />
+                        <Binding Path="CommboxID[3]" />
+                    </MultiBinding>
+                </local:_7175_Alg_4.Visibility>
+            </local:_7175_Alg_4>
 
         </StackPanel>
     </Viewbox>

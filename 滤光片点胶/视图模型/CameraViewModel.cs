@@ -21,13 +21,17 @@ namespace 滤光片点胶
         /// <summary>
         /// 相机信息
         /// </summary>
-        public HiKhelper HiKCamera = new HiKhelper();
-
+        public HiKhelper HiKCamera
+        {
+            get => GetProperty(() => HiKCamera);
+            set => SetProperty(() => HiKCamera, value);
+        }
         /// <summary>
         /// /构造函数
         /// </summary>
         public CameraViewModel()
         {
+            HiKCamera = new HiKhelper();
             camInfos = HiKhelper.CamInfos;
             stp = new SmartThreadPool { MaxThreads = 1 };
             HiKCamera.MV_OnOriFrameInvoked += Hik_MV_OnOriFrameInvoked;
@@ -130,45 +134,106 @@ namespace 滤光片点胶
             //    if (0 != item.Function()) break;
             //}
             //CVAlgorithms.MV_Download(ref bmpBuf);
-            float[] outParam = new float[3];
-            string[] inParam = new string[16];
-            inParam[0] = ShowMode.ToString();
+            float[] outParam = new float[5];
+            string[] inParam = new string[17];
 
-            inParam[1] = LocThresh.ToString();
-            inParam[2] = MaxRadius.ToString();
-            inParam[3] = MinRadius.ToString();
+            if (SelectedAlg < 2)
+            {
+                inParam[0] = ShowMode.ToString();
 
-            inParam[4] = Radius.ToString();
-            inParam[5] = nMaxRadius.ToString();
-            inParam[6] = nMinRadius.ToString();
+                inParam[1] = LocThresh.ToString();
+                inParam[2] = MaxRadius.ToString();
+                inParam[3] = MinRadius.ToString();
 
-            inParam[7] = D1thresh.ToString();
-            inParam[8] = D1SizeMax.ToString();
-            inParam[9] = D1SizeMin.ToString();
+                inParam[4] = Radius.ToString();
+                inParam[5] = nMaxRadius.ToString();
+                inParam[6] = nMinRadius.ToString();
 
-            inParam[10] = D2AdapSize.ToString();
-            inParam[11] = D2AdapC.ToString();
-            inParam[12] = D2RoundnessMin.ToString();
-            inParam[13] = D2RectangularityMin.ToString();
-            inParam[14] = D2sizeMax.ToString();
-            inParam[15] = D2sizeMin.ToString();
+                inParam[7] = D1thresh.ToString();
+                inParam[8] = D1SizeMax.ToString();
+                inParam[9] = D1SizeMin.ToString();
+
+                inParam[10] = D2AdapSize.ToString();
+                inParam[11] = D2AdapC.ToString();
+                inParam[12] = D2RoundnessMin.ToString();
+                inParam[13] = D2RectangularityMin.ToString();
+                inParam[14] = D2sizeMax.ToString();
+                inParam[15] = D2sizeMin.ToString();
+            }
+            else
+            {
+                inParam[0] = ShowMode.ToString();
+                inParam[1] = WorkMode.ToString();
+
+                inParam[2] = X_Defult.ToString();
+                inParam[3] = Y_Defult.ToString();
+
+                inParam[4] = Scale.ToString();
+                inParam[5] = OffsetMax.ToString();
+
+                inParam[4] = Scale.ToString();
+                inParam[5] = OffsetMax.ToString();
+
+                inParam[6] = MinRadius.ToString();
+                inParam[7] = MaxRadius.ToString();
+
+                inParam[8] = X_flip.ToString();
+                inParam[9] = Y_flip.ToString();
+                inParam[10] = XY_flip.ToString();
+
+                inParam[11] = R_min.ToString();
+                inParam[12] = G_min.ToString();
+                inParam[13] = B_min.ToString();
+
+                inParam[14] = R_max.ToString();
+                inParam[15] = G_max.ToString();
+                inParam[16] = B_max.ToString();
+            }
 
             CVAlgorithms.MV_EntryPoint(SelectedAlg, ref bmpBuf, inParam, ref outParam[0]);
-
-
+            
             if (HiKCamera.isTrigger)
             {
-                if (outParam[0] == 1)
-                {
-                    MV_OnSendMess?.Invoke(this, "T");
-                }
-                else
-                {
-                    MV_OnSendMess?.Invoke(this, "F");
-                }
-            }
-            
+                string str = "";
+                if (outParam[0] == 1) str += "T";
+                else str += "F";
 
+                if (SelectedAlg >= 2)
+                {
+                    int num = (int)outParam[2];
+                    str += string.Format("{0:000}", outParam[1]);
+                    if (num >= 0) str += "+";
+                    str += string.Format("{0:0000}", outParam[2]);
+                    num = (int)outParam[3];
+                    if (num >= 0) str += "+";
+                    str += string.Format("{0:0000}", outParam[3]);
+                }
+                MV_OnSendMess?.Invoke(this, str);
+
+                //if (outParam[0] == 1)
+                //{
+                //    MV_OnSendMess?.Invoke(this, "T");
+                //}
+                //else
+                //{
+                //    MV_OnSendMess?.Invoke(this, "F");
+                //}
+            }
+
+            if (SelectedAlg == 2)
+            {
+                OffsetRotate.IR_angle = (int)outParam[1];
+                OffsetRotate.actualX = outParam[2];
+                OffsetRotate.actualY = outParam[3];
+
+                OffsetRotate.defaultX = X_Defult;
+                OffsetRotate.defaultY = Y_Defult;
+            }
+
+            if (SelectedAlg == 3)
+            {
+                OffsetRotate.HD_angle = (int)outParam[1];
+            }
 
             //显示
             Application.Current.Dispatcher.Invoke(() =>
@@ -308,6 +373,48 @@ namespace 滤光片点胶
                 classEle = new XElement("D2sizeMin", 0);
                 rootEle.Add(classEle);
 
+                classEle = new XElement("WorkMode", 0);
+                rootEle.Add(classEle);
+
+                classEle = new XElement("X_Defult", 0);
+                rootEle.Add(classEle);
+
+                classEle = new XElement("Y_Defult", 0);
+                rootEle.Add(classEle);
+
+                classEle = new XElement("Scale", 0);
+                rootEle.Add(classEle);
+
+                classEle = new XElement("OffsetMax", 0);
+                rootEle.Add(classEle);
+
+                classEle = new XElement("X_flip", 0);
+                rootEle.Add(classEle);
+
+                classEle = new XElement("Y_flip", 0);
+                rootEle.Add(classEle);
+
+                classEle = new XElement("XY_flip", 0);
+                rootEle.Add(classEle);
+
+                classEle = new XElement("R_min", 0);
+                rootEle.Add(classEle);
+
+                classEle = new XElement("G_min", 0);
+                rootEle.Add(classEle);
+
+                classEle = new XElement("B_min", 0);
+                rootEle.Add(classEle);
+
+                classEle = new XElement("R_max", 0);
+                rootEle.Add(classEle);
+
+                classEle = new XElement("G_max", 0);
+                rootEle.Add(classEle);
+
+                classEle = new XElement("B_max", 0);
+                rootEle.Add(classEle);
+
                 xdoc.Save(localFilePath);
             }
             catch
@@ -349,6 +456,27 @@ namespace 滤光片点胶
                     D2RectangularityMin = float.Parse(Config.Descendants("D2RectangularityMin").ElementAt(0).Value);
                     D2sizeMax = int.Parse(Config.Descendants("D2sizeMax").ElementAt(0).Value);
                     D2sizeMin = int.Parse(Config.Descendants("D2sizeMin").ElementAt(0).Value);
+
+                    WorkMode = int.Parse(Config.Descendants("WorkMode").ElementAt(0).Value);
+
+                    X_Defult = float.Parse(Config.Descendants("X_Defult").ElementAt(0).Value);
+                    Y_Defult = float.Parse(Config.Descendants("Y_Defult").ElementAt(0).Value);
+
+                    Scale = float.Parse(Config.Descendants("Scale").ElementAt(0).Value);
+                    OffsetMax = float.Parse(Config.Descendants("OffsetMax").ElementAt(0).Value);
+
+                    X_flip = int.Parse(Config.Descendants("X_flip").ElementAt(0).Value);
+                    Y_flip = int.Parse(Config.Descendants("Y_flip").ElementAt(0).Value);
+                    XY_flip = int.Parse(Config.Descendants("XY_flip").ElementAt(0).Value);
+
+                    R_min = int.Parse(Config.Descendants("R_min").ElementAt(0).Value);
+                    G_min = int.Parse(Config.Descendants("G_min").ElementAt(0).Value);
+                    B_min = int.Parse(Config.Descendants("B_min").ElementAt(0).Value);
+
+                    R_max = int.Parse(Config.Descendants("R_max").ElementAt(0).Value);
+                    G_max = int.Parse(Config.Descendants("G_max").ElementAt(0).Value);
+                    B_max = int.Parse(Config.Descendants("B_max").ElementAt(0).Value);
+
                 }
                 catch (Exception err)
                 {
@@ -383,6 +511,203 @@ namespace 滤光片点胶
                 config.Save(filePath);
             });
         }
+
+        /// <summary>
+        /// 工作模式
+        /// </summary>
+        public int WorkMode
+        {
+            get => GetProperty(() => WorkMode);
+            set => SetProperty(() => WorkMode, value, () =>
+            {
+                XDocument config = XDocument.Load(filePath);
+                config.Descendants("WorkMode").ElementAt(0).SetValue(value);
+                config.Save(filePath);
+            });
+        }
+
+        /// <summary>
+        /// X基准中心
+        /// </summary>
+        public float X_Defult
+        {
+            get => GetProperty(() => X_Defult);
+            set => SetProperty(() => X_Defult, value, () =>
+            {
+                XDocument config = XDocument.Load(filePath);
+                config.Descendants("X_Defult").ElementAt(0).SetValue(value);
+                config.Save(filePath);
+            });
+        }
+
+        /// <summary>
+        /// Y基准中心
+        /// </summary>
+        public float Y_Defult
+        {
+            get => GetProperty(() => Y_Defult);
+            set => SetProperty(() => Y_Defult, value, () =>
+            {
+                XDocument config = XDocument.Load(filePath);
+                config.Descendants("Y_Defult").ElementAt(0).SetValue(value);
+                config.Save(filePath);
+            });
+        }
+
+        /// <summary>
+        /// 比例尺
+        /// </summary>
+        public float Scale
+        {
+            get => GetProperty(() => Scale);
+            set => SetProperty(() => Scale, value, () =>
+            {
+                XDocument config = XDocument.Load(filePath);
+                config.Descendants("Scale").ElementAt(0).SetValue(value);
+                config.Save(filePath);
+            });
+        }
+
+        /// <summary>
+        /// 补偿上限
+        /// </summary>
+        public float OffsetMax
+        {
+            get => GetProperty(() => OffsetMax);
+            set => SetProperty(() => OffsetMax, value, () =>
+            {
+                XDocument config = XDocument.Load(filePath);
+                config.Descendants("OffsetMax").ElementAt(0).SetValue(value);
+                config.Save(filePath);
+            });
+        }
+
+        /// <summary>
+        /// X方向翻转
+        /// </summary>
+        public int X_flip
+        {
+            get => GetProperty(() => X_flip);
+            set => SetProperty(() => X_flip, value, () =>
+            {
+                XDocument config = XDocument.Load(filePath);
+                config.Descendants("X_flip").ElementAt(0).SetValue(value);
+                config.Save(filePath);
+            });
+        }
+
+        /// <summary>
+        /// Y方向翻转
+        /// </summary>
+        public int Y_flip
+        {
+            get => GetProperty(() => Y_flip);
+            set => SetProperty(() => Y_flip, value, () =>
+            {
+                XDocument config = XDocument.Load(filePath);
+                config.Descendants("Y_flip").ElementAt(0).SetValue(value);
+                config.Save(filePath);
+            });
+        }
+
+        /// <summary>
+        /// XY翻转
+        /// </summary>
+        public int XY_flip
+        {
+            get => GetProperty(() => XY_flip);
+            set => SetProperty(() => XY_flip, value, () =>
+            {
+                XDocument config = XDocument.Load(filePath);
+                config.Descendants("XY_flip").ElementAt(0).SetValue(value);
+                config.Save(filePath);
+            });
+        }
+
+        /// <summary>
+        /// R最小值
+        /// </summary>
+        public int R_min
+        {
+            get => GetProperty(() => R_min);
+            set => SetProperty(() => R_min, value, () =>
+            {
+                XDocument config = XDocument.Load(filePath);
+                config.Descendants("R_min").ElementAt(0).SetValue(value);
+                config.Save(filePath);
+            });
+        }
+
+        /// <summary>
+        /// G最小值
+        /// </summary>
+        public int G_min
+        {
+            get => GetProperty(() => G_min);
+            set => SetProperty(() => G_min, value, () =>
+            {
+                XDocument config = XDocument.Load(filePath);
+                config.Descendants("G_min").ElementAt(0).SetValue(value);
+                config.Save(filePath);
+            });
+        }
+
+        /// <summary>
+        /// B最小值
+        /// </summary>
+        public int B_min
+        {
+            get => GetProperty(() => B_min);
+            set => SetProperty(() => B_min, value, () =>
+            {
+                XDocument config = XDocument.Load(filePath);
+                config.Descendants("B_min").ElementAt(0).SetValue(value);
+                config.Save(filePath);
+            });
+        }
+
+        /// <summary>
+        /// R最大值
+        /// </summary>
+        public int R_max
+        {
+            get => GetProperty(() => R_max);
+            set => SetProperty(() => R_max, value, () =>
+            {
+                XDocument config = XDocument.Load(filePath);
+                config.Descendants("R_max").ElementAt(0).SetValue(value);
+                config.Save(filePath);
+            });
+        }
+
+        /// <summary>
+        /// G最大值
+        /// </summary>
+        public int G_max
+        {
+            get => GetProperty(() => G_max);
+            set => SetProperty(() => G_max, value, () =>
+            {
+                XDocument config = XDocument.Load(filePath);
+                config.Descendants("G_max").ElementAt(0).SetValue(value);
+                config.Save(filePath);
+            });
+        }
+
+        /// <summary>
+        /// B最大值
+        /// </summary>
+        public int B_max
+        {
+            get => GetProperty(() => B_max);
+            set => SetProperty(() => B_max, value, () =>
+            {
+                XDocument config = XDocument.Load(filePath);
+                config.Descendants("B_max").ElementAt(0).SetValue(value);
+                config.Save(filePath);
+            });
+        }
+
 
         /// <summary>
         /// 定位-灰度阈值

@@ -13,7 +13,7 @@
         Width="800">
     <Window.Resources>
         <ContextMenu x:Key="ContextMenu">
-            <MenuItem Header="变更触发模式" 
+            <MenuItem Header="连续/触发" 
                       Command="{Binding ModeSwitchCommand}"
                       Visibility="{Binding ShowButton,Converter={StaticResource Boolean2VisibilityConverter}}"/>
             <!--<Separator></Separator>-->
