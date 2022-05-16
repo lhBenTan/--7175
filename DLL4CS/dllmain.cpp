@@ -893,7 +893,6 @@ void HDtest(BmpBuf &data, char** input_Parameter, float* output_Parameter_Float)
 
 	for (size_t i = 0; i < contours.size(); i++)
 	{
-
 		vector<Point2i> tmp;
 		convexHull(contours[i], tmp);
 		double tmpArea = contourArea(tmp);

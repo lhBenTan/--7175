@@ -122,18 +122,10 @@ namespace 滤光片点胶
         /// <param name="e"></param>
         private void MV_STPAction(int i, HiKhelper.MV_IM_INFO e)
         {
-
             bmpBuf.Width = e.width;
             bmpBuf.Height = e.height;
             bmpBuf.pData_IntPtr = e.pData;
-            //CVAlgorithms.MV_Upload(e.width, e.height, ref bmpBuf, 3);
 
-
-            //foreach (var item in AlgPros.ElementAt(0).ProList)
-            //{
-            //    if (0 != item.Function()) break;
-            //}
-            //CVAlgorithms.MV_Download(ref bmpBuf);
             float[] outParam = new float[5];
             string[] inParam = new string[17];
 
@@ -189,36 +181,7 @@ namespace 滤光片点胶
                 inParam[15] = G_max.ToString();
                 inParam[16] = B_max.ToString();
             }
-
             CVAlgorithms.MV_EntryPoint(SelectedAlg, ref bmpBuf, inParam, ref outParam[0]);
-            
-            if (HiKCamera.isTrigger)
-            {
-                string str = "";
-                if (outParam[0] == 1) str += "T";
-                else str += "F";
-
-                if (SelectedAlg >= 2)
-                {
-                    int num = (int)outParam[2];
-                    str += string.Format("{0:000}", outParam[1]);
-                    if (num >= 0) str += "+";
-                    str += string.Format("{0:0000}", outParam[2]);
-                    num = (int)outParam[3];
-                    if (num >= 0) str += "+";
-                    str += string.Format("{0:0000}", outParam[3]);
-                }
-                MV_OnSendMess?.Invoke(this, str);
-
-                //if (outParam[0] == 1)
-                //{
-                //    MV_OnSendMess?.Invoke(this, "T");
-                //}
-                //else
-                //{
-                //    MV_OnSendMess?.Invoke(this, "F");
-                //}
-            }
 
             if (SelectedAlg == 2)
             {
@@ -234,6 +197,39 @@ namespace 滤光片点胶
             {
                 OffsetRotate.HD_angle = (int)outParam[1];
             }
+
+            if (HiKCamera.isTrigger)
+            {
+                string str = "";
+                if (outParam[0] == 1) str += "T";
+                else str += "F";
+
+                if (SelectedAlg >= 2)
+                {
+                    int num;
+                    str += string.Format("{0:000}", outParam[1]);
+
+                    num = (int)outParam[2];
+                    if (num >= 0) str += "+";
+                    str += string.Format("{0:0000}", num);
+
+                    num = (int)outParam[3];
+                    if (num >= 0) str += "+";
+                    str += string.Format("{0:0000}", num);
+                }
+                MV_OnSendMess?.Invoke(this, str);
+
+                //if (outParam[0] == 1)
+                //{
+                //    MV_OnSendMess?.Invoke(this, "T");
+                //}
+                //else
+                //{
+                //    MV_OnSendMess?.Invoke(this, "F");
+                //}
+            }
+
+            
 
             //显示
             Application.Current.Dispatcher.Invoke(() =>

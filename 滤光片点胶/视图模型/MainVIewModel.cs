@@ -35,6 +35,8 @@ namespace 滤光片点胶
 
             MySerial.MV_Mess += Serial_OnTrigger;
 
+            MV_OnSendMess += SY_MV_OnSendMsg;
+
             foreach (var item in MultiView.DictPanel.Values)
             {
                 IsCamOn.Add(false);
@@ -53,7 +55,7 @@ namespace 滤光片点胶
             Version = Application.ResourceAssembly.GetName().Version.ToString();
 
 
-            MV_OnSendMess?.Invoke(this , "");
+            //MV_OnSendMess?.Invoke(this , "");
         }
 
         #region 绑定参数
@@ -290,11 +292,11 @@ namespace 滤光片点胶
                         _str += "T";
                         _str += string.Format("{0:000}", data[0]);
                         int num = (int)data[1];
-                        if (num >= 0) str += "+";
-                        _str += string.Format("{0:0000}", data[1]);
+                        if (num >= 0) _str += "+";
+                        _str += string.Format("{0:0000}", num);
                         num = (int)data[2];
-                        if (num >= 0) str += "+";
-                        _str += string.Format("{0:0000}", data[2]);
+                        if (num >= 0) _str += "+";
+                        _str += string.Format("{0:0000}", num);
 
                         MV_OnSendMess?.Invoke(this, _str);
 

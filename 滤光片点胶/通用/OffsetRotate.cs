@@ -20,8 +20,8 @@ namespace 滤光片点胶
         {
             float[] ret = new float[3];
 
-            float offsetX = actualX - defaultX;
-            float offsetY = actualY - defaultY; 
+            float offsetX = actualX;// - defaultX;
+            float offsetY = actualY;// - defaultY; 
 
             float r = (float)Math.Sqrt(offsetX * offsetX + offsetY * offsetY);
 

@@ -124,7 +124,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="OffsetRotate.cs" />
+    <Compile Include="通用\OffsetRotate.cs" />
     <Compile Include="控件\7175_Alg_4.xaml.cs">
       <DependentUpon>7175_Alg_4.xaml</DependentUpon>
     </Compile>
