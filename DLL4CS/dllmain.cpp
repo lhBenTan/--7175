@@ -821,10 +821,12 @@ void HDtest(BmpBuf &data, char** input_Parameter, float* output_Parameter_Float)
 {
 #pragma region 本地参数
 	Mat src;
-	//src = imread("C:\\Users\\Administrator\\Desktop\\7175\\外观\\P6\\11.bmp", 0);
+	//src = imread("C:\\Users\\Administrator\\Desktop\\10.bmp", 0);
 	src = Mat(data.h, data.w, CV_8UC1, data.data_Input);//默认使用判胶相机
 	Mat gray, mask, roi,output;
 	vector<vector<Point>> contours;
+	vector<Point> points; 
+	vector<int> indexs;
 	vector<Vec4i> hierarcy;
 	stringstream str;
 	RotatedRect ell;
@@ -862,6 +864,8 @@ void HDtest(BmpBuf &data, char** input_Parameter, float* output_Parameter_Float)
 	
 	int AngMinGray = stoi(input_Parameter[13]);
 	int AngMaxGray = stoi(input_Parameter[16]);
+
+	int minSize = stoi(input_Parameter[17]);
 #pragma endregion
 
 #pragma region 预处理
@@ -888,6 +892,7 @@ void HDtest(BmpBuf &data, char** input_Parameter, float* output_Parameter_Float)
 #pragma endregion
 
 #pragma region 轮廓筛选
+	
 	int MaxL = -1;
 	long area = -1;
 
@@ -908,7 +913,7 @@ void HDtest(BmpBuf &data, char** input_Parameter, float* output_Parameter_Float)
 #pragma endregion
 
 #pragma region 轮廓风险
-	if (MaxL >= 0)
+	if (0 <= MaxL)
 	{
 
 #pragma region 部品中心查找
@@ -963,7 +968,7 @@ void HDtest(BmpBuf &data, char** input_Parameter, float* output_Parameter_Float)
 			cvtColor(gray, output, CV_GRAY2RGB);
 		}
 		gray.copyTo(roi, mask);
-		findContours(roi, contours, hierarcy, RETR_TREE, CHAIN_APPROX_NONE);
+		findContours(roi, contours, hierarcy, RETR_EXTERNAL, CHAIN_APPROX_NONE);
 
 		circle(output, center, AmaxRadius, Scalar(0, 255, 0), 2);
 		circle(output, center, AminRadius, Scalar(0, 255, 0), 2);
@@ -972,15 +977,80 @@ void HDtest(BmpBuf &data, char** input_Parameter, float* output_Parameter_Float)
 		area = -1;
 		for (size_t i = 0; i < contours.size(); i++)
 		{
-			vector<Point2i> tmp;
-			convexHull(contours[i], tmp);
-			double tmpArea = contourArea(tmp);
-			if (tmpArea > area)
+			if (FALSE)
 			{
-				area = (long)tmpArea;
-				MaxL = i;
+				//一点定圆
+				vector<Point2i> tmp;
+				convexHull(contours[i], tmp);
+				double tmpArea = contourArea(tmp);
+				if (tmpArea > area)
+				{
+					area = (long)tmpArea;
+					MaxL = i;
+				}
+			}
+			else
+			{
+				if (10 < contours[i].size())
+				{
+					//五点定圆
+					Point2f center;
+					float radius;
+					minEnclosingCircle(contours[i], center, radius);
+					if (radius > minSize)
+					{
+						points.push_back(center);
+						indexs.push_back(i);
+					}
+				}
 			}
 		}
+
+		if (true)
+		{
+			str << "当前定位点数：" << points.size() << endl;
+			if (5 == points.size())
+			{
+				MaxL = -1;
+				area = LONG_MAX;
+				for (size_t i = 0; i < 5; i++)
+				{
+					long _area = 0;
+
+					//五点定圆
+					Point2f center = points[i];
+
+					stringstream _s;
+					_s << i << endl;
+					putTextZH(output, _s.str().c_str(), center, Scalar(255, 0, 0), 10, "黑体", 0);
+
+
+					for (size_t j = 0; j < 4; j++)
+					{
+						Point2f p1 = center;
+						Point2f p2 = points[(i + j + 1) % 5];
+
+						Point2f of = p2 - p1;
+
+						_area += sqrtf(powf(of.x, 2) + powf(of.y, 2));
+					}
+
+					if (_area < area)
+					{
+						area = _area;
+						MaxL = indexs[i];
+					}
+				}
+				
+			}
+			else if (1 == points.size())
+			{
+				//area = _area;
+				MaxL = indexs[0];
+			}
+		}
+		
+		
 
 		if (MaxL >=0 && 10 < contours[MaxL].size())
 		{

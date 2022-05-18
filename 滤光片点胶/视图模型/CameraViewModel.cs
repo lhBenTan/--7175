@@ -122,141 +122,152 @@ namespace 滤光片点胶
         /// <param name="e"></param>
         private void MV_STPAction(int i, HiKhelper.MV_IM_INFO e)
         {
-            bmpBuf.Width = e.width;
-            bmpBuf.Height = e.height;
-            bmpBuf.pData_IntPtr = e.pData;
-
-            float[] outParam = new float[5];
-            string[] inParam = new string[17];
-
-            if (SelectedAlg < 2)
+            try
             {
-                inParam[0] = ShowMode.ToString();
+                bmpBuf.Width = e.width;
+                bmpBuf.Height = e.height;
+                bmpBuf.pData_IntPtr = e.pData;
 
-                inParam[1] = LocThresh.ToString();
-                inParam[2] = MaxRadius.ToString();
-                inParam[3] = MinRadius.ToString();
+                float[] outParam = new float[5];
+                string[] inParam = new string[18];
 
-                inParam[4] = Radius.ToString();
-                inParam[5] = nMaxRadius.ToString();
-                inParam[6] = nMinRadius.ToString();
-
-                inParam[7] = D1thresh.ToString();
-                inParam[8] = D1SizeMax.ToString();
-                inParam[9] = D1SizeMin.ToString();
-
-                inParam[10] = D2AdapSize.ToString();
-                inParam[11] = D2AdapC.ToString();
-                inParam[12] = D2RoundnessMin.ToString();
-                inParam[13] = D2RectangularityMin.ToString();
-                inParam[14] = D2sizeMax.ToString();
-                inParam[15] = D2sizeMin.ToString();
-            }
-            else
-            {
-                inParam[0] = ShowMode.ToString();
-                inParam[1] = WorkMode.ToString();
-
-                inParam[2] = X_Defult.ToString();
-                inParam[3] = Y_Defult.ToString();
-
-                inParam[4] = Scale.ToString();
-                inParam[5] = OffsetMax.ToString();
-
-                inParam[4] = Scale.ToString();
-                inParam[5] = OffsetMax.ToString();
-
-                inParam[6] = MinRadius.ToString();
-                inParam[7] = MaxRadius.ToString();
-
-                inParam[8] = X_flip.ToString();
-                inParam[9] = Y_flip.ToString();
-                inParam[10] = XY_flip.ToString();
-
-                inParam[11] = R_min.ToString();
-                inParam[12] = G_min.ToString();
-                inParam[13] = B_min.ToString();
-
-                inParam[14] = R_max.ToString();
-                inParam[15] = G_max.ToString();
-                inParam[16] = B_max.ToString();
-            }
-            CVAlgorithms.MV_EntryPoint(SelectedAlg, ref bmpBuf, inParam, ref outParam[0]);
-
-            if (SelectedAlg == 2)
-            {
-                OffsetRotate.IR_angle = (int)outParam[1];
-                OffsetRotate.actualX = outParam[2];
-                OffsetRotate.actualY = outParam[3];
-
-                OffsetRotate.defaultX = X_Defult;
-                OffsetRotate.defaultY = Y_Defult;
-            }
-
-            if (SelectedAlg == 3)
-            {
-                OffsetRotate.HD_angle = (int)outParam[1];
-            }
-
-            if (HiKCamera.isTrigger)
-            {
-                string str = "";
-                if (outParam[0] == 1) str += "T";
-                else str += "F";
-
-                if (SelectedAlg >= 2)
+                if (SelectedAlg < 2)
                 {
-                    int num;
-                    str += string.Format("{0:000}", outParam[1]);
+                    inParam[0] = ShowMode.ToString();
 
-                    num = (int)outParam[2];
-                    if (num >= 0) str += "+";
-                    str += string.Format("{0:0000}", num);
+                    inParam[1] = LocThresh.ToString();
+                    inParam[2] = MaxRadius.ToString();
+                    inParam[3] = MinRadius.ToString();
 
-                    num = (int)outParam[3];
-                    if (num >= 0) str += "+";
-                    str += string.Format("{0:0000}", num);
+                    inParam[4] = Radius.ToString();
+                    inParam[5] = nMaxRadius.ToString();
+                    inParam[6] = nMinRadius.ToString();
+
+                    inParam[7] = D1thresh.ToString();
+                    inParam[8] = D1SizeMax.ToString();
+                    inParam[9] = D1SizeMin.ToString();
+
+                    inParam[10] = D2AdapSize.ToString();
+                    inParam[11] = D2AdapC.ToString();
+                    inParam[12] = D2RoundnessMin.ToString();
+                    inParam[13] = D2RectangularityMin.ToString();
+                    inParam[14] = D2sizeMax.ToString();
+                    inParam[15] = D2sizeMin.ToString();
                 }
-                MV_OnSendMess?.Invoke(this, str);
-
-                //if (outParam[0] == 1)
-                //{
-                //    MV_OnSendMess?.Invoke(this, "T");
-                //}
-                //else
-                //{
-                //    MV_OnSendMess?.Invoke(this, "F");
-                //}
-            }
-
-            
-
-            //显示
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                int size = (int)bmpBuf.size;
-                if (ImSrc_test == null || ImSrc_test.Width != bmpBuf.Width || ImSrc_test.Height != bmpBuf.Height)
+                else
                 {
-                    if (size > 3 * bmpBuf.Width * bmpBuf.Height / 2)
-                        ImSrc_test = new WriteableBitmap(bmpBuf.Width, bmpBuf.Height, 96.0, 96.0, PixelFormats.Bgr24, null);
-                    else
-                        ImSrc_test = new WriteableBitmap(bmpBuf.Width, bmpBuf.Height, 24.0, 24.0, PixelFormats.Gray8, null);
+                    inParam[0] = ShowMode.ToString();
+                    inParam[1] = WorkMode.ToString();
+
+                    inParam[2] = X_Defult.ToString();
+                    inParam[3] = Y_Defult.ToString();
+
+                    inParam[4] = Scale.ToString();
+                    inParam[5] = OffsetMax.ToString();
+
+                    inParam[4] = Scale.ToString();
+                    inParam[5] = OffsetMax.ToString();
+
+                    inParam[6] = MinRadius.ToString();
+                    inParam[7] = MaxRadius.ToString();
+
+                    inParam[8] = X_flip.ToString();
+                    inParam[9] = Y_flip.ToString();
+                    inParam[10] = XY_flip.ToString();
+
+                    inParam[11] = R_min.ToString();
+                    inParam[12] = G_min.ToString();
+                    inParam[13] = B_min.ToString();
+
+                    inParam[14] = R_max.ToString();
+                    inParam[15] = G_max.ToString();
+                    inParam[16] = B_max.ToString();
+
+                    inParam[17] = nMaxRadius.ToString();
+                }
+                CVAlgorithms.MV_EntryPoint(SelectedAlg, ref bmpBuf, inParam, ref outParam[0]);
+
+                if (SelectedAlg == 2)
+                {
+                    OffsetRotate.IR_angle = (int)outParam[1];
+                    OffsetRotate.actualX = outParam[2];
+                    OffsetRotate.actualY = outParam[3];
+
+                    OffsetRotate.defaultX = X_Defult;
+                    OffsetRotate.defaultY = Y_Defult;
                 }
 
-                lock (objlock)
+                if (SelectedAlg == 3)
                 {
-                    if ((e.pData != (IntPtr)0x00000000))
+                    OffsetRotate.HD_angle = (int)outParam[1];
+                }
+
+                if (HiKCamera.isTrigger)
+                {
+                    string str = "";
+                    if (outParam[0] == 1) str += "T";
+                    else str += "F";
+
+                    if (SelectedAlg >= 2)
                     {
-                        ImSrc_test.Lock();
-                        ImSrc_test.WritePixels(new Int32Rect(0, 0, bmpBuf.Width, bmpBuf.Height), bmpBuf.pData, size, ImSrc_test.BackBufferStride);
-                        ImSrc_test.AddDirtyRect(new Int32Rect(0, 0, bmpBuf.Width, bmpBuf.Height));
-                        ImSrc_test.Unlock();
+                        int num;
+                        str += string.Format("{0:000}", outParam[1]);
 
+                        num = (int)outParam[2];
+                        if (num >= 0) str += "+";
+                        str += string.Format("{0:0000}", num);
+
+                        num = (int)outParam[3];
+                        if (num >= 0) str += "+";
+                        str += string.Format("{0:0000}", num);
                     }
+                    MV_OnSendMess?.Invoke(this, str);
+
+                    //if (outParam[0] == 1)
+                    //{
+                    //    MV_OnSendMess?.Invoke(this, "T");
+                    //}
+                    //else
+                    //{
+                    //    MV_OnSendMess?.Invoke(this, "F");
+                    //}
                 }
 
-                CVAlgorithms.MV_Release(ref bmpBuf);
-            });
+
+
+                //显示
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    int size = (int)bmpBuf.size;
+                    if (ImSrc_test == null || ImSrc_test.Width != bmpBuf.Width || ImSrc_test.Height != bmpBuf.Height)
+                    {
+                        if (size > 3 * bmpBuf.Width * bmpBuf.Height / 2)
+                            ImSrc_test = new WriteableBitmap(bmpBuf.Width, bmpBuf.Height, 96.0, 96.0, PixelFormats.Bgr24, null);
+                        else
+                            ImSrc_test = new WriteableBitmap(bmpBuf.Width, bmpBuf.Height, 24.0, 24.0, PixelFormats.Gray8, null);
+                    }
+
+                    lock (objlock)
+                    {
+                        if ((e.pData != (IntPtr)0x00000000))
+                        {
+                            ImSrc_test.Lock();
+                            ImSrc_test.WritePixels(new Int32Rect(0, 0, bmpBuf.Width, bmpBuf.Height), bmpBuf.pData, size, ImSrc_test.BackBufferStride);
+                            ImSrc_test.AddDirtyRect(new Int32Rect(0, 0, bmpBuf.Width, bmpBuf.Height));
+                            ImSrc_test.Unlock();
+
+                        }
+                    }
+
+                    CVAlgorithms.MV_Release(ref bmpBuf);
+                });
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            
             
 
             ////这里是固定的
