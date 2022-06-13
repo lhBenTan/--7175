@@ -19,6 +19,21 @@
                     <ColumnDefinition Width="3*"/>
                     <ColumnDefinition Width="4*"/>
                 </Grid.ColumnDefinitions>
+
+                <TextBlock Text="当前算法" Grid.Column="0" VerticalAlignment="Center"/>
+
+                <ComboBox Grid.Column="1"
+                          SelectedIndex="{Binding camParamViewModel._AlgNum, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" >
+                    <ComboBoxItem Content="1" />
+                    <ComboBoxItem Content="2" />
+                </ComboBox>
+            </Grid>
+
+            <Grid Margin="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="4*"/>
+                </Grid.ColumnDefinitions>
                 <TextBlock Text="相机选择" Grid.Column="0" VerticalAlignment="Center"/>
                 <ComboBox Grid.Column="1"
                           ItemsSource="{Binding camParamViewModel.camInfos}"
@@ -27,61 +42,16 @@
                           DisplayMemberPath="Name"/>
             </Grid>
 
-            <Grid Margin="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="3*"/>
-                    <ColumnDefinition Width="4*"/>
-                </Grid.ColumnDefinitions>
+            <TabControl>
+                <TabItem Header="拍照位1">
+                    <local:AlgConfig DataContext="{Binding camParamViewModel.ParamsVMs[0]}"/>
+                </TabItem>
 
-                <TextBlock Text="功能选择" Grid.Column="0" VerticalAlignment="Center"/>
-
-                <ComboBox Grid.Column="1"
-                          SelectedIndex="{Binding camParamViewModel.SelectedAlg, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" >
-                    <ComboBoxItem Content="识别算法1" />
-                    <ComboBoxItem Content="识别算法2" />
-                    <ComboBoxItem Content="识别算法3 - 滤光片识别" />
-                    <ComboBoxItem Content="识别算法4 - 镜筒识别" />
-                </ComboBox>
-            </Grid>
-
-            <hc:Divider Content="参数"/>
-
-            <local:_7175_Alg_1>
-                <local:_7175_Alg_1.Visibility>
-                    <MultiBinding Converter="{StaticResource CACG_Conv}">
-                        <Binding Path="camParamViewModel.SelectedAlg" />
-                        <Binding Path="CommboxID[0]" />
-                    </MultiBinding>
-                </local:_7175_Alg_1.Visibility>
-            </local:_7175_Alg_1>
-
-            <local:_7175_Alg_2>
-                <local:_7175_Alg_2.Visibility>
-                    <MultiBinding Converter="{StaticResource CACG_Conv}">
-                        <Binding Path="camParamViewModel.SelectedAlg" />
-                        <Binding Path="CommboxID[1]" />
-                    </MultiBinding>
-                </local:_7175_Alg_2.Visibility>
-            </local:_7175_Alg_2>
-
-            <local:_7175_Alg_3>
-                <local:_7175_Alg_3.Visibility>
-                    <MultiBinding Converter="{StaticResource CACG_Conv}">
-                        <Binding Path="camParamViewModel.SelectedAlg" />
-                        <Binding Path="CommboxID[2]" />
-                    </MultiBinding>
-                </local:_7175_Alg_3.Visibility>
-            </local:_7175_Alg_3>
-
-            <local:_7175_Alg_4>
-                <local:_7175_Alg_4.Visibility>
-                    <MultiBinding Converter="{StaticResource CACG_Conv}">
-                        <Binding Path="camParamViewModel.SelectedAlg" />
-                        <Binding Path="CommboxID[3]" />
-                    </MultiBinding>
-                </local:_7175_Alg_4.Visibility>
-            </local:_7175_Alg_4>
-
+                <TabItem Header="拍照位2">
+                    <local:AlgConfig DataContext="{Binding camParamViewModel.ParamsVMs[1]}"/>
+                </TabItem>
+            </TabControl>
+            
         </StackPanel>
     </Viewbox>
 </UserControl>

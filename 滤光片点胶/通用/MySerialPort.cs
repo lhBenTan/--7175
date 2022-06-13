@@ -213,6 +213,8 @@ namespace 滤光片点胶
 
         public MySerialPort()
         {
+            isShow = false;
+
             SerialInfos = new ObservableCollection<CommboxInfo>();
             ParityInfos = new ObservableCollection<CommboxInfo>();
             StopBitsInfos = new ObservableCollection<CommboxInfo>();
@@ -238,8 +240,6 @@ namespace 滤光片点胶
         
         #region 外调函数
         
-        
-
         /// <summary>
         /// 发送一条信息
         /// </summary>
@@ -462,6 +462,15 @@ namespace 滤光片点胶
                 config.Descendants("SelectedStopBits").ElementAt(0).SetValue(value);
                 config.Save("./Para/ComConfig.xml");
             });
+        }
+
+        /// <summary>
+        /// 端口号 true表示使用网口
+        /// </summary>
+        public bool isShow
+        {
+            get => GetProperty(() => isShow);
+            set => SetProperty(() => isShow, value);
         }
 
 #if false

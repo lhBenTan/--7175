@@ -6,9 +6,9 @@
              xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns:local="clr-namespace:滤光片点胶"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" Background="White">
+             d:DesignWidth="300" Background="White">
     <Viewbox>
-        <ScrollViewer Height="300" Width="300">
+        <ScrollViewer Width="300">
             <StackPanel>
                 
                 <Grid Margin="2">
@@ -20,7 +20,7 @@
                     <TextBlock Text="画面显示" Grid.Column="0" VerticalAlignment="Center"/>
 
                     <ComboBox Grid.Column="1"
-                          SelectedIndex="{Binding camParamViewModel.ShowMode,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" >
+                          SelectedIndex="{Binding ShowMode,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" >
                         <ComboBoxItem Content="原图显示" />
                         <ComboBoxItem Content="灰度显示" />
                     </ComboBox>
@@ -35,7 +35,7 @@
                     <TextBlock Text="补偿模式" Grid.Column="0" VerticalAlignment="Center"/>
 
                     <ComboBox Grid.Column="1"
-                          SelectedIndex="{Binding camParamViewModel.WorkMode,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" >
+                          SelectedIndex="{Binding WorkMode,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" >
                         <ComboBoxItem Content="转子补偿" />
                         <ComboBoxItem Content="定子补偿" />
                     </ComboBox>
@@ -61,8 +61,8 @@
                                                 VerticalAlignment="Center"
                                                 Minimum="0" 
                                                 Maximum="255"
-                                                ValueEnd="{Binding camParamViewModel.R_max,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
-                                                ValueStart="{Binding camParamViewModel.R_min,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                                ValueEnd="{Binding R_max,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                                ValueStart="{Binding R_min,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                             </Grid>
 
                             <Grid Margin="2,10">
@@ -80,8 +80,8 @@
                                                 VerticalAlignment="Center"
                                                 Minimum="0" 
                                                 Maximum="255"
-                                                ValueEnd="{Binding camParamViewModel.G_max,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
-                                                ValueStart="{Binding camParamViewModel.G_min,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                                ValueEnd="{Binding G_max,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                                ValueStart="{Binding G_min,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                             </Grid>
 
                             <Grid Margin="2,10">
@@ -99,8 +99,8 @@
                                                 VerticalAlignment="Center"
                                                 Minimum="0" 
                                                 Maximum="255"
-                                                ValueEnd="{Binding camParamViewModel.B_max,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
-                                                ValueStart="{Binding camParamViewModel.B_min,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                                ValueEnd="{Binding B_max,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                                ValueStart="{Binding B_min,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                             </Grid>
 
                         </StackPanel>
@@ -119,7 +119,7 @@
 
                                 <hc:NumericUpDown Grid.Column="1" 
                                                   Minimum="1" 
-                                                  Value="{Binding camParamViewModel.MaxRadius,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                                  Value="{Binding MaxRadius,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                             </Grid>
 
                             <Grid Margin="2">
@@ -132,7 +132,7 @@
 
                                 <hc:NumericUpDown Grid.Column="1" 
                                                   Minimum="1" 
-                                                  Value="{Binding camParamViewModel.MinRadius,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                                  Value="{Binding MinRadius,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                             </Grid>
 
                         </StackPanel>
@@ -152,7 +152,7 @@
                                 <hc:NumericUpDown Grid.Column="1" 
                                                   Minimum="0" 
                                                   ValueFormat="#0.000"
-                                                  Value="{Binding camParamViewModel.X_Defult,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                                  Value="{Binding X_Defult,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                             </Grid>
 
                             <Grid Margin="2">
@@ -166,7 +166,7 @@
                                 <hc:NumericUpDown Grid.Column="1" 
                                                   Minimum="0" 
                                                   ValueFormat="#0.000"
-                                                  Value="{Binding camParamViewModel.Y_Defult,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                                  Value="{Binding Y_Defult,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                             </Grid>
 
                             <Grid Margin="2">
@@ -181,7 +181,7 @@
                                                   Minimum="0" 
                                                   Maximum="1"
                                                   ValueFormat="#0.00000"
-                                                  Value="{Binding camParamViewModel.Scale,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                                  Value="{Binding Scale,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                             </Grid>
 
                             <Grid Margin="2">
@@ -194,7 +194,7 @@
 
                                 <hc:NumericUpDown Grid.Column="1" 
                                                   Minimum="0" 
-                                                  Value="{Binding camParamViewModel.OffsetMax,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                                  Value="{Binding OffsetMax,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                             </Grid>
 
 
@@ -216,7 +216,7 @@
                                 <TextBlock Text="X翻转" Grid.Column="0" VerticalAlignment="Center"/>
 
                                 <ComboBox Grid.Column="1"
-                                          SelectedIndex="{Binding camParamViewModel.X_flip,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" >
+                                          SelectedIndex="{Binding X_flip,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" >
                                     <ComboBoxItem Content="关闭" />
                                     <ComboBoxItem Content="启用" />
                                 </ComboBox>
@@ -231,7 +231,7 @@
                                 <TextBlock Text="Y翻转" Grid.Column="0" VerticalAlignment="Center"/>
 
                                 <ComboBox Grid.Column="1"
-                                          SelectedIndex="{Binding camParamViewModel.Y_flip,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" >
+                                          SelectedIndex="{Binding Y_flip,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" >
                                     <ComboBoxItem Content="关闭" />
                                     <ComboBoxItem Content="启用" />
                                 </ComboBox>
@@ -246,7 +246,7 @@
                                 <TextBlock Text="XY翻转" Grid.Column="0" VerticalAlignment="Center"/>
 
                                 <ComboBox Grid.Column="1"
-                                          SelectedIndex="{Binding camParamViewModel.XY_flip,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" >
+                                          SelectedIndex="{Binding XY_flip,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" >
                                     <ComboBoxItem Content="关闭" />
                                     <ComboBoxItem Content="启用" />
                                 </ComboBox>

@@ -76,6 +76,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="控件\AlgConfig.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="控件\7175_Alg_4.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -124,6 +128,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Compile Include="通用\MySocket.cs" />
+    <Compile Include="控件\AlgConfig.xaml.cs">
+      <DependentUpon>AlgConfig.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="视图模型\ParamsModelView.cs" />
     <Compile Include="通用\OffsetRotate.cs" />
     <Compile Include="控件\7175_Alg_4.xaml.cs">
       <DependentUpon>7175_Alg_4.xaml</DependentUpon>

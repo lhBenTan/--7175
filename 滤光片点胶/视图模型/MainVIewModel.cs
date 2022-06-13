@@ -15,11 +15,15 @@ namespace 滤光片点胶
     public class MainViewModel:ViewModelBase
     {
         /// <summary>
-        /// 路由事件，回调原始帧
+        /// 通讯段口选择
+        /// true表示网口
+        /// false表示串口
         /// </summary>
-        public event EventHandler<string> MV_OnSendMess;
-        //delegate void bbb(object sender, string str);
-        
+        bool lanORser = true;
+
+
+        #region 构造函数
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -34,6 +38,7 @@ namespace 滤光片点胶
             int i = 0;
 
             MySerial.MV_Mess += Serial_OnTrigger;
+            mySocket.MV_onMess += Serial_OnTrigger;
 
             MV_OnSendMess += SY_MV_OnSendMsg;
 
@@ -53,10 +58,9 @@ namespace 滤光片点胶
             }
 
             Version = Application.ResourceAssembly.GetName().Version.ToString();
-
-
-            //MV_OnSendMess?.Invoke(this , "");
         }
+
+        #endregion
 
         #region 绑定参数
 
@@ -119,6 +123,7 @@ namespace 滤光片点胶
             get => GetProperty(() => Version);
             set => SetProperty(() => Version, value);
         }
+        
         #endregion
 
         #region Commands
@@ -151,10 +156,12 @@ namespace 滤光片点胶
                     IsCamOn[i] = true;
                     //MultiView.DictPanel[i].camera.camera.TriggerMode();
                 }
-                
             }
 
-            IsCamOn[MultiView.DictPanel.Count] = MySerial.OpenPort();
+            if (lanORser)
+                IsCamOn[MultiView.DictPanel.Count] = mySocket.Listen();
+            else
+                IsCamOn[MultiView.DictPanel.Count] = MySerial.OpenPort();
 
         }
 
@@ -175,7 +182,13 @@ namespace 滤光片点胶
                     IsCamOn[i] = false;
                 }
             }
+
             IsCamOn[MultiView.DictPanel.Count] = false;
+
+            if (lanORser)
+                mySocket.StopListen();
+            else
+                MySerial.ClosePort();
         }
 
         /// <summary>
@@ -207,7 +220,11 @@ namespace 滤光片点胶
             if (true == loginWindow.ShowDialog())
             {
                 ComWindow comConfig = new ComWindow();
-                comConfig.DataContext = MySerial;
+                if (lanORser)
+                    comConfig.DataContext = mySocket;
+                else
+                    comConfig.DataContext = MySerial;
+
                 comConfig.Show();
             }
         } 
@@ -249,6 +266,11 @@ namespace 滤光片点胶
             }
             IsCamOn[MultiView.DictPanel.Count] = false;
 
+            if (lanORser)
+                mySocket.StopListen();
+            else
+                MySerial.ClosePort();
+
             Application.Current.Shutdown(-1);
         }
 
@@ -257,55 +279,95 @@ namespace 滤光片点胶
         #region 通讯相关
 
         /// <summary>
+        /// 路由事件，回调原始帧
+        /// </summary>
+        public event EventHandler<string> MV_OnSendMess;
+        //delegate void bbb(object sender, string str);
+
+        /// <summary>
         /// 串口通讯实例
         /// </summary>
         MySerialPort MySerial = new MySerialPort();
+
+        /// <summary>
+        /// 网口通讯实例
+        /// </summary>
+        MySocket mySocket = new MySocket();
 
         /// <summary>
         /// 信息分发
         /// </summary> 
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Serial_OnTrigger(object sender, string e)
+        public void Serial_OnTrigger(object sender, string e)
         {
             string str = new string(e.ToList().Where(c => c != '\0').ToArray());
-            if (str.Length != 1)
+            if (str.Length != 2)
             {
-                MySerial.WriteLine("接收无效信息：" + str, "Red");
+                if (lanORser)
+                    mySocket.WriteLine("接收无效信息：" + str, "Red");
+                else
+                    MySerial.WriteLine("接收无效信息：" + str, "Red");
+
                 return;
             }
 
-            int nRet = 0;
+            //switch (str[0])
+            //{
+            //    case 'A':
+            //        nRet = MultiView.DictPanel[0].CamVM.HiKCamera.TriggerOnce(); break;
+            //    case 'B':
+            //        nRet = MultiView.DictPanel[1].CamVM.HiKCamera.TriggerOnce(); break;
+            //    case 'C':
+            //        nRet = MultiView.DictPanel[2].CamVM.HiKCamera.TriggerOnce(); break;
+            //    case 'D':
+            //        {
+            //            float[] data = OffsetRotate.Rotate();
+            //            string _str = "";
+            //            _str += "T";
+            //            _str += string.Format("{0:000}", data[0]);
+            //            int num = (int)data[1];
+            //            if (num >= 0) _str += "+";
+            //            _str += string.Format("{0:0000}", num);
+            //            num = (int)data[2];
+            //            if (num >= 0) _str += "+";
+            //            _str += string.Format("{0:0000}", num);
+            //            MV_OnSendMess?.Invoke(this, _str);
+            //        }
+            //        break;
+            //    default:
+            //        break;
+            //}
+
+            CellPanel cell = null;
+
             switch (str[0])
             {
-                case 'A':
-                    nRet = MultiView.DictPanel[0].CamVM.HiKCamera.TriggerOnce(); break;
-                case 'B':
-                    nRet = MultiView.DictPanel[1].CamVM.HiKCamera.TriggerOnce(); break;
-                case 'C':
-                    nRet = MultiView.DictPanel[2].CamVM.HiKCamera.TriggerOnce(); break;
-                case 'D':
-                    {
-                        float[] data = OffsetRotate.Rotate();
-
-                        string _str = "";
-                        _str += "T";
-                        _str += string.Format("{0:000}", data[0]);
-                        int num = (int)data[1];
-                        if (num >= 0) _str += "+";
-                        _str += string.Format("{0:0000}", num);
-                        num = (int)data[2];
-                        if (num >= 0) _str += "+";
-                        _str += string.Format("{0:0000}", num);
-
-                        MV_OnSendMess?.Invoke(this, _str);
-
-                    }
-                    break;
+                case 'A': cell = MultiView.DictPanel[0]; break;
+                case 'B': cell = MultiView.DictPanel[1]; break;
+                case 'C': cell = MultiView.DictPanel[2]; break;
+                case 'D': cell = MultiView.DictPanel[3]; break;
                 default:
                     break;
             }
-            MySerial.WriteLine("接收信息：" + str);
+
+            switch (str[1])
+            {
+                case '1': cell.CamVM.AlgNum = 0; break;
+                case '2': cell.CamVM.AlgNum = 1; break;
+                default:
+                    break;
+            }
+
+            if (cell != null) cell.CamVM.HiKCamera.TriggerOnce();
+
+
+
+            if (lanORser)
+                mySocket.WriteLine("接收信息：" + str);
+            else
+                MySerial.WriteLine("接收信息：" + str);
+
         }
 
         /// <summary>
@@ -315,7 +377,10 @@ namespace 滤光片点胶
         /// <param name="msg"></param>
         private void SY_MV_OnSendMsg(object sender, string msg)
         {
-            MySerial.SendCommand(msg);
+            if (lanORser)
+                mySocket.SocketSend(Encoding.Default.GetBytes(msg));
+            else
+                MySerial.SendCommand(msg);
         }
 
         #endregion

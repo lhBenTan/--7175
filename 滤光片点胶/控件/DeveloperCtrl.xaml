@@ -21,6 +21,7 @@
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Text="相机1" 
@@ -44,9 +45,16 @@
                                HorizontalAlignment="Center" 
                                VerticalAlignment="Center"/>
 
-                    <TextBlock Text="PLC" 
+                    <TextBlock Text="相机4" 
                                FontSize="10"
                                Grid.Column="3"
+                               Grid.Row="0"
+                               HorizontalAlignment="Center" 
+                               VerticalAlignment="Center"/>
+
+                    <TextBlock Text="PLC" 
+                               FontSize="10"
+                               Grid.Column="4"
                                Grid.Row="0"
                                HorizontalAlignment="Center" 
                                VerticalAlignment="Center"/>
@@ -123,6 +131,25 @@
                             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="" Foreground="{DynamicResource TextIconBrush}" Panel.ZIndex="0"/>
                         </Grid>
                     </ToggleButton>
+
+                    <ToggleButton IsChecked="{Binding IsCamOn[4]}" 
+                                      IsEnabled="False"
+                                      Grid.Column="4"
+                                      Grid.Row="1"
+                                      Style="{StaticResource ToggleButtonCustom}" 
+                                      hc:StatusSwitchElement.HideUncheckedElement="True" >
+                        <hc:StatusSwitchElement.CheckedElement>
+                            <Grid>
+                                <Ellipse Width="20" Height="20" Fill="{DynamicResource SuccessBrush}" StrokeThickness="1" Stroke="{DynamicResource SuccessBrush}"/>
+                                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="" Foreground="{DynamicResource PrimaryBrush}" Panel.ZIndex="0"/>
+                            </Grid>
+                        </hc:StatusSwitchElement.CheckedElement>
+                        <Grid>
+                            <Ellipse Width="20" Height="20" Fill="{DynamicResource DangerBrush}" StrokeThickness="1" Stroke="{DynamicResource DangerBrush}" />
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="" Foreground="{DynamicResource TextIconBrush}" Panel.ZIndex="0"/>
+                        </Grid>
+                    </ToggleButton>
+
 
                 </Grid>
             </GroupBox>

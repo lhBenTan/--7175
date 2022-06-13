@@ -30,17 +30,19 @@ namespace 滤光片点胶
             Loaded += (s, e) =>
             {
                 grid.Tag = 1;
-                MultiView.InitGrid(grid, 3);
-                MultiView.SetCurrentModel(3);
+                MultiView.InitGrid(grid, 4);
+                MultiView.SetCurrentModel(4);
 
                 Run run = new Run("[控制台输出]\n");
                 Console.Inlines.Add(run);
                 run.Foreground = new SolidColorBrush(Colors.White);
                 MySerialPort.OriginalTextBlock = Console;
+                MySocket.OriginalTextBlock = Console;
                 
 
                 MainVM = new MainViewModel();
                 this.DataContext = MainVM;
+                
             };
         }
     }

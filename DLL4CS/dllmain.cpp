@@ -33,6 +33,8 @@ struct BmpBuf
 
 };
 
+#include "Filter.h"
+
 void DirtyTestG1R1(BmpBuf &data, char** input_Parameter, float* output_Parameter_Float)
 {
 #pragma region 本地参数
@@ -45,8 +47,10 @@ void DirtyTestG1R1(BmpBuf &data, char** input_Parameter, float* output_Parameter
 	
 	str << "G1R1" << endl;
 
+	temp = Mat(data.h, data.w, CV_8UC1, data.data_Input);//
+	temp.copyTo(src);
 	//src = Mat(data.h, data.w, CV_8UC1, data.data_Input);//
-	src = imread("C:\\Users\\Administrator\\Desktop\\7175\\外观\\G1R1\\0324\\8.bmp", 0);
+	//src = imread("C:\\Users\\Administrator\\Desktop\\7175\\外观\\G1R1\\0324\\8.bmp", 0);
 #pragma endregion
 
 #pragma region 参数载入
@@ -114,8 +118,12 @@ void DirtyTestG1R1(BmpBuf &data, char** input_Parameter, float* output_Parameter
 #pragma region 预处理
 		warpPolar(src, Polared, Size(Radius, Radius * 2 * CV_PI), ell.center, Radius, WARP_POLAR_LINEAR);
 
+		Mat _temp;
+		
+
 		toBlur = Polared;
-		blur(toBlur, Blured, Size(7, 101));
+		//SurfaceFittig(Polared, Blured, 1, 1);
+		GaussianBlur(Polared, Blured, Size(7, 101),0);
 		Diff = toBlur - Blured;
 
 		//按区域进行放大
@@ -333,8 +341,8 @@ void DirtyTestP2R1(BmpBuf &data, char** input_Parameter, float* output_Parameter
 	Mat	src, dst, temp, labels, stats, centroids, toBlur, Polared, Blured, Diff, show, DePolared, mask, ROI, kernel;
 	
 	str << "P2R1" << endl;
-	//src = Mat(data.h, data.w, CV_8UC1, data.data_Input);//默认判胶相机使用的是彩色相机
-	src = imread("C:\\Users\\Administrator\\Desktop\\7175\\外观\\P2R1\\0325\\2\\26.bmp", 0);
+	src = Mat(data.h, data.w, CV_8UC1, data.data_Input);//默认判胶相机使用的是彩色相机
+	//src = imread("C:\\Users\\Administrator\\Desktop\\7175\\外观\\P2R1\\0325\\2\\26.bmp", 0);
 	cvtColor(src, dst, COLOR_GRAY2RGB);
 #pragma endregion
 
@@ -820,10 +828,7 @@ void IRtest(BmpBuf &data, char** input_Parameter, float* output_Parameter_Float)
 void HDtest(BmpBuf &data, char** input_Parameter, float* output_Parameter_Float)
 {
 #pragma region 本地参数
-	Mat src;
-	//src = imread("C:\\Users\\Administrator\\Desktop\\10.bmp", 0);
-	src = Mat(data.h, data.w, CV_8UC1, data.data_Input);//默认使用判胶相机
-	Mat gray, mask, roi,output;
+	Mat src, gray, mask, roi, output;
 	vector<vector<Point>> contours;
 	vector<Point> points; 
 	vector<int> indexs;
@@ -869,7 +874,17 @@ void HDtest(BmpBuf &data, char** input_Parameter, float* output_Parameter_Float)
 #pragma endregion
 
 #pragma region 预处理
-	cvtColor(src, output, CV_GRAY2RGB);
+
+	if (data.size / data.h / data.w > 1.5)
+	{
+		output = Mat(data.h, data.w, CV_8UC3, data.data_Input);
+		cvtColor(output, src, CV_RGB2GRAY);
+	}
+	else
+	{
+		src = Mat(data.h, data.w, CV_8UC1, data.data_Input);
+		cvtColor(src, output, CV_GRAY2RGB);
+	}
 
 	//roi跟threshold的顺序可以变更
 	threshold(src, gray, MaxGray, 255, THRESH_TOZERO_INV);
@@ -921,6 +936,8 @@ void HDtest(BmpBuf &data, char** input_Parameter, float* output_Parameter_Float)
 		vector<Point> tmpCont;
 
 		convexHull(contours[MaxL], tmpCont);
+		//这里是防止拟合出来的轮廓点数太少产生异常
+		while (5 > tmpCont.size())tmpCont.push_back(tmpCont.front());
 		ell = fitEllipse(tmpCont);
 		ellipse(output, ell, Scalar(255, 0, 0), 2);	//有效轮廓以蓝色
 
@@ -1142,12 +1159,22 @@ void HDtest(BmpBuf &data, char** input_Parameter, float* output_Parameter_Float)
 #pragma endregion
 }
 
-
-
 void ErrOutput(BmpBuf &data, char** input_Parameter, float* output_Parameter_Float)
 {
-	Mat src = Mat(data.h, data.w, CV_8UC1, data.data_Input);//默认非点胶后相机提供的原始图像为黑白图像
-	Mat	output;
+	//Mat src = Mat(data.h, data.w, CV_8UC1, data.data_Input);//默认非点胶后相机提供的原始图像为黑白图像
+	Mat	src,output;
+
+	if (data.size / data.h / data.w > 1.5)
+	{
+		output = Mat(data.h, data.w, CV_8UC3, data.data_Input);
+		cvtColor(output, src, CV_RGB2GRAY);
+	}
+	else
+	{
+		src = Mat(data.h, data.w, CV_8UC1, data.data_Input);
+		cvtColor(src, output, CV_GRAY2RGB);
+	}
+
 	stringstream str;
 	cvtColor(src, output, COLOR_GRAY2RGB);
 
