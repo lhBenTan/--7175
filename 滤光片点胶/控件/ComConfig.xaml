@@ -8,50 +8,52 @@
              mc:Ignorable="d"  d:DesignWidth="300">
     <Viewbox>
         <StackPanel>
-            <StackPanel Width="300" Visibility="{Binding isShow,Converter={StaticResource Boolean2VisibilityReConverter}}">
 
-                <Grid Margin="2">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="3*"/>
-                        <ColumnDefinition Width="4*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="串口号" Grid.Column="0" VerticalAlignment="Center"/>
-                    <ComboBox Grid.Column="1"
+            <StackPanel Width="300" Visibility="Collapsed">
+                <StackPanel Width="300" Visibility="{Binding isShow,Converter={StaticResource Boolean2VisibilityReConverter}}">
+
+                    <Grid Margin="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="4*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="串口号" Grid.Column="0" VerticalAlignment="Center"/>
+                        <ComboBox Grid.Column="1"
                           ItemsSource="{Binding SerialInfos}"
                           SelectedIndex="{Binding SelectedSerial, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" 
                           SelectedValuePath="ID"
                           DisplayMemberPath="Name"/>
-                </Grid>
+                    </Grid>
 
-                <Grid Margin="2">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="3*"/>
-                        <ColumnDefinition Width="4*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="波特率" Grid.Column="0" VerticalAlignment="Center"/>
-                    <hc:NumericUpDown Grid.Column="1" Value="{Binding BaudRate,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                </Grid>
+                    <Grid Margin="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="4*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="波特率" Grid.Column="0" VerticalAlignment="Center"/>
+                        <hc:NumericUpDown Grid.Column="1" Value="{Binding BaudRate,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                    </Grid>
 
-                <Grid Margin="2">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="3*"/>
-                        <ColumnDefinition Width="4*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="校验位" Grid.Column="0" VerticalAlignment="Center"/>
-                    <ComboBox Grid.Column="1"
+                    <Grid Margin="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="4*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="校验位" Grid.Column="0" VerticalAlignment="Center"/>
+                        <ComboBox Grid.Column="1"
                           ItemsSource="{Binding ParityInfos}"
                           SelectedIndex="{Binding SelectedParity, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" 
                           SelectedValuePath="ID"
                           DisplayMemberPath="Name"/>
-                </Grid>
+                    </Grid>
 
-                <Grid Margin="2,7">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="3*"/>
-                        <ColumnDefinition Width="4*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="数据位" Grid.Column="0" VerticalAlignment="Center"/>
-                    <Slider Grid.Column="1" 
+                    <Grid Margin="2,7">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="4*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="数据位" Grid.Column="0" VerticalAlignment="Center"/>
+                        <Slider Grid.Column="1" 
                         Value="{Binding DataBits,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                         hc:TipElement.Visibility="Visible"  
                         hc:TipElement.Placement="Top" 
@@ -61,24 +63,50 @@
                         Maximum="8"
                         TickFrequency="1"
                         TickPlacement="BottomRight"/>
-                </Grid>
-                <!--SelectedStopBits-->
-                <Grid Margin="2">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="3*"/>
-                        <ColumnDefinition Width="4*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="停止位" Grid.Column="0" VerticalAlignment="Center"/>
-                    <ComboBox Grid.Column="1"
+                    </Grid>
+                    <!--SelectedStopBits-->
+                    <Grid Margin="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="4*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="停止位" Grid.Column="0" VerticalAlignment="Center"/>
+                        <ComboBox Grid.Column="1"
                           ItemsSource="{Binding StopBitsInfos}"
                           SelectedIndex="{Binding SelectedStopBits, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" 
                           SelectedValuePath="ID"
                           DisplayMemberPath="Name"/>
-                </Grid>
+                    </Grid>
 
+                </StackPanel>
+
+                <StackPanel Width="300" Visibility="{Binding isShow,Converter={StaticResource Boolean2VisibilityConverter}}">
+
+                    <Grid Margin="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="4*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="本机IP" Grid.Column="0" VerticalAlignment="Center"/>
+                        <hc:TextBox Grid.Column="1"
+                                TextAlignment="Right"
+                                Text="{Binding IP_Adress,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                    </Grid>
+
+                    <Grid Margin="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="4*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="端口号" Grid.Column="0" VerticalAlignment="Center"/>
+                        <hc:TextBox Grid.Column="1"
+                                TextAlignment="Right"
+                                Text="{Binding nPort,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                    </Grid>
+                </StackPanel>
             </StackPanel>
 
-            <StackPanel Width="300" Visibility="{Binding isShow,Converter={StaticResource Boolean2VisibilityConverter}}">
+            <StackPanel Width="300" Visibility="Visible">
                 <Grid Margin="2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="3*"/>
@@ -87,7 +115,7 @@
                     <TextBlock Text="本机IP" Grid.Column="0" VerticalAlignment="Center"/>
                     <hc:TextBox Grid.Column="1"
                                 TextAlignment="Right"
-                                Text="{Binding IP_Adress,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                Text="{Binding camParamViewModel.mySocket.IP_Adress,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                 </Grid>
 
                 <Grid Margin="2">
@@ -98,9 +126,10 @@
                     <TextBlock Text="端口号" Grid.Column="0" VerticalAlignment="Center"/>
                     <hc:TextBox Grid.Column="1"
                                 TextAlignment="Right"
-                                Text="{Binding nPort,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                Text="{Binding camParamViewModel.mySocket.nPort,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                 </Grid>
             </StackPanel>
+
         </StackPanel>
     </Viewbox>
 </UserControl>

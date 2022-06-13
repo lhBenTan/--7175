@@ -11,7 +11,7 @@
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         mc:Ignorable="d"
-        Title="设置" Height="300" Width="400">
+        Title="设置" Width="400">
     <Grid>
         <local:ComConfig VerticalAlignment="Top"/>
     </Grid>

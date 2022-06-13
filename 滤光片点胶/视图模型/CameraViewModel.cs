@@ -29,13 +29,11 @@ namespace 滤光片点胶
             camInfos = HiKhelper.CamInfos;
             stp = new SmartThreadPool { MaxThreads = 1 };
             HiKCamera.MV_OnOriFrameInvoked += Hik_MV_OnOriFrameInvoked;
-
             ParamsVMs = new ObservableCollection<ParamsModelView>
             {
                 new ParamsModelView(0),
                 new ParamsModelView(1)
             };
-
             ImSrc_test = new WriteableBitmap(new BitmapImage(new Uri(@"./图片/null.png", UriKind.Relative)));
         }
 
@@ -109,6 +107,15 @@ namespace 滤光片点胶
             get => GetProperty(() => ParamsVMs);
             set => SetProperty(() => ParamsVMs, value);
         }
+
+        /// <summary>
+        /// 网口通讯实例
+        /// </summary>
+        public MySocket mySocket
+        {
+            get => GetProperty(() => mySocket);
+            set => SetProperty(() => mySocket, value);
+        }
         #endregion
 
         #region 相机操作
@@ -124,11 +131,19 @@ namespace 滤光片点胶
 
         public void Connect()
         {
+            if (!MainViewModel.isOneServer)
+            {
+                mySocket.Listen();
+            }
             HiKCamera.Connect(SelectedCam);
         }
 
         public void Disconnect()
         {
+            if (!MainViewModel.isOneServer && mySocket != null)
+            {
+                mySocket.StopListen();
+            }
             HiKCamera.Disconnect();
         }
 
@@ -255,7 +270,16 @@ namespace 滤光片点胶
                         if (num >= 0) str += "+";
                         str += string.Format("{0:0000}", num);
                     }
-                    MV_OnSendMess?.Invoke(this, str);
+
+                    if (MainViewModel.isOneServer)
+                    {
+                        MV_OnSendMess?.Invoke(this, str);
+                    }
+                    else
+                    {
+                        mySocket.SocketSend(Encoding.Default.GetBytes(str));
+                    }
+                    
 
                     //if (outParam[0] == 1)
                     //{
@@ -301,7 +325,6 @@ namespace 滤光片点胶
 
                 throw;
             }
-
         }
 
         /// <summary>
@@ -327,6 +350,45 @@ namespace 滤光片点胶
         /// 路由事件，回调原始帧
         /// </summary>
         public event EventHandler<string> MV_OnSendMess;
+        
+        /// <summary>
+        /// 信息分发
+        /// </summary> 
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void Serial_OnTrigger(object sender, string e)
+        {
+            //单服务器不允许运行以下代码
+            if (MainViewModel.isOneServer) return;
+
+            string str = new string(e.ToList().Where(c => c != '\0').ToArray());
+            if (str.Length != 2)
+            {
+                mySocket.WriteLine("接收无效信息：" + str, "Red");
+
+                return;
+            }
+
+            //选择相机
+            switch (str[1])
+            {
+                case '1': AlgNum = 0; break;
+                case '2': AlgNum = 1; break;
+                default:
+                    AlgNum = 0;
+                    mySocket.WriteLine("接收错误信息：" + str, "Red");
+                    return;
+            }
+
+            if (str[0] == 'M') HiKCamera.TriggerOnce();
+            else
+            {
+                mySocket.WriteLine("接收错误信息：" + str, "Red");
+                return;
+            }
+
+            mySocket.WriteLine("接收信息：" + str);
+        }
         #endregion
 
         #region 参数读取
@@ -344,10 +406,8 @@ namespace 滤光片点胶
                 try
                 {
                     XDocument Config = XDocument.Load(path + "/CamConfig.xml");
-
                     SelectedCam = int.Parse(Config.Descendants("SelectedCam").ElementAt(0).Value);
                     AlgNum = int.Parse(Config.Descendants("AlgNum").ElementAt(0).Value);
-
                 }
                 catch (Exception err)
                 {
@@ -358,6 +418,12 @@ namespace 滤光片点胶
                 foreach (var item in ParamsVMs)
                 {
                     item.Init(path + "/AlgConfig");
+                }
+
+                if (!MainViewModel.isOneServer)
+                {
+                    mySocket = new MySocket(CamID);
+                    mySocket.MV_onMess += Serial_OnTrigger;
                 }
             }
             else

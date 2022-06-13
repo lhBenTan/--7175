@@ -28,6 +28,15 @@ namespace 滤光片点胶
             Init();
         }
 
+        public MySocket(int n)
+        {
+            isShow = true;
+            CamID = n;
+
+            //配置文件读取
+            Init();
+        }
+
         ~MySocket()
         {
             if(ListenThread != null) ListenThread.Abort();
@@ -55,7 +64,8 @@ namespace 滤光片点胶
         /// 监听线程
         /// </summary>
         Thread ListenThread;
-        
+
+        int CamID = -1;
         #endregion
 
         #region 绑定参数
@@ -68,9 +78,15 @@ namespace 滤光片点胶
             get => GetProperty(() => IP_Adress);
             set => SetProperty(() => IP_Adress, value, () =>
             {
-                XDocument config = XDocument.Load("./Para/NetConfig.xml");
+                string filePath = "./Para/NetConfig.xml";
+                if (CamID >= 0)
+                {
+                    filePath = "./Para/Cam" + CamID + "/NetConfig.xml";
+                }
+
+                XDocument config = XDocument.Load(filePath);
                 config.Descendants("IP_Adress").ElementAt(0).SetValue(value);
-                config.Save("./Para/NetConfig.xml");
+                config.Save(filePath);
             });
         }
 
@@ -82,9 +98,15 @@ namespace 滤光片点胶
             get => GetProperty(() => nPort);
             set => SetProperty(() => nPort, value, () =>
             {
-                XDocument config = XDocument.Load("./Para/NetConfig.xml");
+                string filePath = "./Para/NetConfig.xml";
+                if (CamID >= 0)
+                {
+                    filePath = "./Para/Cam" + CamID + "/NetConfig.xml";
+                }
+
+                XDocument config = XDocument.Load(filePath);
                 config.Descendants("nPort").ElementAt(0).SetValue(value);
-                config.Save("./Para/NetConfig.xml");
+                config.Save(filePath);
             });
         }
 
@@ -344,11 +366,13 @@ namespace 滤光片点胶
         /// </summary>
         private void InitErr()
         {
+            //获得文件路径
+            string localFilePath = "";
+            localFilePath = "./Para/NetConfig.xml";
+            if (CamID >= 0) localFilePath = "./Para/Cam" + CamID + "/NetConfig.xml";
+
             try
             {
-                //获得文件路径
-                string localFilePath = "";
-                localFilePath = "./Para/NetConfig.xml";
                 XDocument xdoc = new XDocument();
                 XDeclaration xdec = new XDeclaration("1.0", "utf-8", "yes");
                 xdoc.Declaration = xdec;
@@ -371,7 +395,7 @@ namespace 滤光片点胶
             }
             catch
             {
-                Growl.Error("[" + "./Para/NetConfig.xml" + "]生成失败！");
+                Growl.Error("[" + localFilePath + "]生成失败！");
             }
         }
 
@@ -381,11 +405,17 @@ namespace 滤光片点胶
         private void Init()
         {
             int ret = 0;
+            string Path = "./Para";
             string filePath = "./Para/NetConfig.xml";
+            if (CamID >= 0)
+            {
+                filePath = "./Para/Cam" + CamID + "/NetConfig.xml";
+                Path = "./Para/Cam" + CamID;
+            }
 
             try
             {
-                if (XmlHelper.Exists("./Para", "NetConfig.xml"))
+                if (XmlHelper.Exists(Path, "NetConfig.xml"))
                 {
                     XDocument Config = XDocument.Load(filePath);
 

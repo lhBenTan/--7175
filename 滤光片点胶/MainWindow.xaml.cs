@@ -30,8 +30,8 @@ namespace 滤光片点胶
             Loaded += (s, e) =>
             {
                 grid.Tag = 1;
-                MultiView.InitGrid(grid, 4);
-                MultiView.SetCurrentModel(4);
+                MultiView.InitGrid(grid, 2);
+                MultiView.SetCurrentModel(2);
 
                 Run run = new Run("[控制台输出]\n");
                 Console.Inlines.Add(run);
