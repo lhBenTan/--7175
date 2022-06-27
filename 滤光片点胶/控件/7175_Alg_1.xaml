@@ -6,214 +6,405 @@
              xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns:local="clr-namespace:滤光片点胶"
              mc:Ignorable="d"  d:DesignWidth="300">
+    <UserControl.Resources>
+        <local:CACG_Conv x:Key="CACG_Conv"/>
+    </UserControl.Resources>
     <Viewbox>
         <ScrollViewer Width="300">
             <StackPanel>
+                <!--外观检测-旧算法-->
+                <StackPanel Visibility="Collapsed">
 
-                <Grid Margin="2">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="3*"/>
-                        <ColumnDefinition Width="4*"/>
-                    </Grid.ColumnDefinitions>
+                    <Grid Margin="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="4*"/>
+                        </Grid.ColumnDefinitions>
 
-                    <TextBlock Text="画面显示" Grid.Column="0" VerticalAlignment="Center"/>
+                        <TextBlock Text="画面显示" Grid.Column="0" VerticalAlignment="Center"/>
 
-                    <ComboBox Grid.Column="1"
-                          SelectedIndex="{Binding ShowMode,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" >
-                        <ComboBoxItem Content="原图显示" />
-                        <ComboBoxItem Content="定位画面" />
-                        <ComboBoxItem Content="脏污类型1" />
-                        <ComboBoxItem Content="脏污类型2" />
-                    </ComboBox>
-                </Grid>
+                        <ComboBox Grid.Column="1"
+                              SelectedIndex="{Binding ShowMode,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" >
+                            <ComboBoxItem Content="原图显示" />
+                            <ComboBoxItem Content="定位画面" />
+                            <ComboBoxItem Content="脏污类型1" />
+                            <ComboBoxItem Content="脏污类型2" />
+                        </ComboBox>
+                    </Grid>
                 
-                <TabControl>
-                    <TabItem Header="定位">
-                        <StackPanel>
+                    <TabControl>
+                        <TabItem Header="定位">
+                            <StackPanel>
                             
-                            <Grid Margin="2">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="3*"/>
-                                    <ColumnDefinition Width="4*"/>
-                                </Grid.ColumnDefinitions>
+                                <Grid Margin="2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3*"/>
+                                        <ColumnDefinition Width="4*"/>
+                                    </Grid.ColumnDefinitions>
 
-                                <TextBlock Text="灰度阈值" Grid.Column="0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="灰度阈值" Grid.Column="0" VerticalAlignment="Center"/>
 
-                                <hc:NumericUpDown Grid.Column="1" 
-                                                  Minimum="0" 
-                                                  Maximum="255"
-                                                  Value="{Binding LocThresh,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                            </Grid>
+                                    <hc:NumericUpDown Grid.Column="1" 
+                                                      Minimum="0" 
+                                                      Maximum="255"
+                                                      Value="{Binding LocThresh,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
 
-                            <Grid Margin="2" Height="25">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="3*"/>
-                                    <ColumnDefinition Width="4*"/>
-                                </Grid.ColumnDefinitions>
+                                <Grid Margin="2" Height="25">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3*"/>
+                                        <ColumnDefinition Width="4*"/>
+                                    </Grid.ColumnDefinitions>
 
-                                <TextBlock Text="半径范围" Grid.Column="0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="半径范围" Grid.Column="0" VerticalAlignment="Center"/>
 
-                                <hc:RangeSlider Grid.Column="1" 
-                                                hc:TipElement.Visibility="Visible" 
-                                                hc:TipElement.Placement="Top" 
-                                                hc:TipElement.StringFormat="#0" 
-                                                VerticalAlignment="Center"
-                                                Minimum="0" 
-                                                Maximum="1000"
-                                                ValueStart="{Binding MinRadius,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
-                                                ValueEnd="{Binding MaxRadius,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                            </Grid>
+                                    <hc:RangeSlider Grid.Column="1" 
+                                                    hc:TipElement.Visibility="Visible" 
+                                                    hc:TipElement.Placement="Top" 
+                                                    hc:TipElement.StringFormat="#0" 
+                                                    VerticalAlignment="Center"
+                                                    Minimum="0" 
+                                                    Maximum="1000"
+                                                    ValueStart="{Binding MinRadius,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                                    ValueEnd="{Binding MaxRadius,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
 
-                        </StackPanel>
-                    </TabItem>
+                            </StackPanel>
+                        </TabItem>
 
-                    <TabItem Header="检测区域">
-                        <StackPanel>
+                        <TabItem Header="检测区域">
+                            <StackPanel>
 
-                            <Grid Margin="2">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="3*"/>
-                                    <ColumnDefinition Width="4*"/>
-                                </Grid.ColumnDefinitions>
+                                <Grid Margin="2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3*"/>
+                                        <ColumnDefinition Width="4*"/>
+                                    </Grid.ColumnDefinitions>
 
-                                <TextBlock Text="镜片大小" Grid.Column="0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="镜片大小" Grid.Column="0" VerticalAlignment="Center"/>
 
-                                <hc:NumericUpDown Grid.Column="1" 
-                                                  Minimum="0" 
-                                                  Maximum="1024"
-                                                  Value="{Binding Radius,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                            </Grid>
+                                    <hc:NumericUpDown Grid.Column="1" 
+                                                      Minimum="0" 
+                                                      Maximum="1024"
+                                                      Value="{Binding Radius,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
 
-                            <Grid Margin="2" Height="25">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="3*"/>
-                                    <ColumnDefinition Width="4*"/>
-                                </Grid.ColumnDefinitions>
+                                <Grid Margin="2" Height="25">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3*"/>
+                                        <ColumnDefinition Width="4*"/>
+                                    </Grid.ColumnDefinitions>
 
-                                <TextBlock Text="通孔大小" Grid.Column="0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="通孔大小" Grid.Column="0" VerticalAlignment="Center"/>
 
-                                <Slider Grid.Column="1" 
-                                        hc:TipElement.Visibility="Visible" 
-                                        hc:TipElement.Placement="Top" 
-                                        hc:TipElement.StringFormat="#0" 
-                                        VerticalAlignment="Center"
-                                        Minimum="0" 
-                                        Maximum="{Binding Radius,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
-                                        Value="{Binding nMaxRadius,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                            </Grid>
+                                    <Slider Grid.Column="1" 
+                                            hc:TipElement.Visibility="Visible" 
+                                            hc:TipElement.Placement="Top" 
+                                            hc:TipElement.StringFormat="#0" 
+                                            VerticalAlignment="Center"
+                                            Minimum="0" 
+                                            Maximum="{Binding Radius,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                            Value="{Binding nMaxRadius,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
 
-                        </StackPanel>
-                    </TabItem>
+                            </StackPanel>
+                        </TabItem>
 
-                    <TabItem Header="类型1">
-                        <StackPanel>
+                        <TabItem Header="类型1">
+                            <StackPanel>
 
-                            <Grid Margin="2">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="3*"/>
-                                    <ColumnDefinition Width="4*"/>
-                                </Grid.ColumnDefinitions>
+                                <Grid Margin="2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3*"/>
+                                        <ColumnDefinition Width="4*"/>
+                                    </Grid.ColumnDefinitions>
 
-                                <TextBlock Text="强度" Grid.Column="0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="强度" Grid.Column="0" VerticalAlignment="Center"/>
 
-                                <hc:NumericUpDown Grid.Column="1" 
-                                                  Minimum="0" 
-                                                  Maximum="255"
-                                                  Value="{Binding D2AdapSize,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                            </Grid>
+                                    <hc:NumericUpDown Grid.Column="1" 
+                                                      Minimum="0" 
+                                                      Maximum="255"
+                                                      Value="{Binding D2AdapSize,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
 
-                            <Grid Margin="2">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="3*"/>
-                                    <ColumnDefinition Width="4*"/>
-                                </Grid.ColumnDefinitions>
+                                <Grid Margin="2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3*"/>
+                                        <ColumnDefinition Width="4*"/>
+                                    </Grid.ColumnDefinitions>
 
-                                <TextBlock Text="容差" Grid.Column="0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="容差" Grid.Column="0" VerticalAlignment="Center"/>
 
-                                <hc:NumericUpDown Grid.Column="1" 
-                                                  Minimum="-100" 
-                                                  Maximum="100"
-                                                  Value="{Binding D2AdapC,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                            </Grid>
+                                    <hc:NumericUpDown Grid.Column="1" 
+                                                      Minimum="-100" 
+                                                      Maximum="100"
+                                                      Value="{Binding D2AdapC,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
 
-                            <Grid Margin="2" Height="25">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="3*"/>
-                                    <ColumnDefinition Width="4*"/>
-                                </Grid.ColumnDefinitions>
+                                <Grid Margin="2" Height="25">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3*"/>
+                                        <ColumnDefinition Width="4*"/>
+                                    </Grid.ColumnDefinitions>
 
-                                <TextBlock Text="面积范围" Grid.Column="0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="面积范围" Grid.Column="0" VerticalAlignment="Center"/>
 
-                                <hc:RangeSlider Grid.Column="1" 
-                                                hc:TipElement.Visibility="Visible" 
-                                                hc:TipElement.Placement="Top" 
-                                                hc:TipElement.StringFormat="#0" 
-                                                VerticalAlignment="Center"
-                                                Minimum="0" 
-                                                Maximum="1000"
-                                                ValueEnd="{Binding D2sizeMax,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
-                                                ValueStart="{Binding D2sizeMin,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                            </Grid>
+                                    <hc:RangeSlider Grid.Column="1" 
+                                                    hc:TipElement.Visibility="Visible" 
+                                                    hc:TipElement.Placement="Top" 
+                                                    hc:TipElement.StringFormat="#0" 
+                                                    VerticalAlignment="Center"
+                                                    Minimum="0" 
+                                                    Maximum="1000"
+                                                    ValueEnd="{Binding D2sizeMax,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                                    ValueStart="{Binding D2sizeMin,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
 
-                            <Grid Margin="2" Height="25">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="3*"/>
-                                    <ColumnDefinition Width="4*"/>
-                                </Grid.ColumnDefinitions>
+                                <Grid Margin="2" Height="25">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3*"/>
+                                        <ColumnDefinition Width="4*"/>
+                                    </Grid.ColumnDefinitions>
 
-                                <TextBlock Text="圆度上限" Grid.Column="0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="圆度上限" Grid.Column="0" VerticalAlignment="Center"/>
 
-                                <Slider Grid.Column="1" 
-                                        hc:TipElement.Visibility="Visible" 
-                                        hc:TipElement.Placement="Top" 
-                                        hc:TipElement.StringFormat="#0.00" 
-                                        VerticalAlignment="Center"
-                                        Minimum="0" 
-                                        Maximum="1"
-                                        Value="{Binding D2RoundnessMin,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                            </Grid>
+                                    <Slider Grid.Column="1" 
+                                            hc:TipElement.Visibility="Visible" 
+                                            hc:TipElement.Placement="Top" 
+                                            hc:TipElement.StringFormat="#0.00" 
+                                            VerticalAlignment="Center"
+                                            Minimum="0" 
+                                            Maximum="1"
+                                            Value="{Binding D2RoundnessMin,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
 
-                        </StackPanel>
-                    </TabItem>
+                            </StackPanel>
+                        </TabItem>
 
-                    <TabItem Header="类型2">
-                        <StackPanel>
+                        <TabItem Header="类型2">
+                            <StackPanel>
 
-                            <Grid Margin="2">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="3*"/>
-                                    <ColumnDefinition Width="4*"/>
-                                </Grid.ColumnDefinitions>
+                                <Grid Margin="2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3*"/>
+                                        <ColumnDefinition Width="4*"/>
+                                    </Grid.ColumnDefinitions>
 
-                                <TextBlock Text="灰度阈值" Grid.Column="0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="灰度阈值" Grid.Column="0" VerticalAlignment="Center"/>
 
-                                <hc:NumericUpDown Grid.Column="1" 
-                                                  Minimum="0" 
-                                                  Maximum="255"
-                                                  Value="{Binding D1thresh,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                            </Grid>
+                                    <hc:NumericUpDown Grid.Column="1" 
+                                                      Minimum="0" 
+                                                      Maximum="255"
+                                                      Value="{Binding D1thresh,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
 
-                            <Grid Margin="2" Height="25">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="3*"/>
-                                    <ColumnDefinition Width="4*"/>
-                                </Grid.ColumnDefinitions>
+                                <Grid Margin="2" Height="25">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3*"/>
+                                        <ColumnDefinition Width="4*"/>
+                                    </Grid.ColumnDefinitions>
 
-                                <TextBlock Text="面积范围" Grid.Column="0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="面积范围" Grid.Column="0" VerticalAlignment="Center"/>
 
-                                <hc:RangeSlider Grid.Column="1" 
-                                                hc:TipElement.Visibility="Visible" 
-                                                hc:TipElement.Placement="Top" 
-                                                hc:TipElement.StringFormat="#0" 
-                                                VerticalAlignment="Center"
-                                                Minimum="0" 
-                                                Maximum="100"
-                                                ValueEnd="{Binding D1SizeMax,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
-                                                ValueStart="{Binding D1SizeMin,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                            </Grid>
-                        </StackPanel>
-                    </TabItem>
-                </TabControl>
+                                    <hc:RangeSlider Grid.Column="1" 
+                                                    hc:TipElement.Visibility="Visible" 
+                                                    hc:TipElement.Placement="Top" 
+                                                    hc:TipElement.StringFormat="#0" 
+                                                    VerticalAlignment="Center"
+                                                    Minimum="0" 
+                                                    Maximum="100"
+                                                    ValueEnd="{Binding D1SizeMax,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                                    ValueStart="{Binding D1SizeMin,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                </Grid>
+                            </StackPanel>
+                        </TabItem>
+                    </TabControl>
+                </StackPanel>
+
+                <StackPanel Visibility="Visible">
+                    <!--显示模式-->
+                    <ComboBox Margin="5"
+                              hc:InfoElement.Title="显示模式" 
+                              hc:InfoElement.TitleWidth="140" 
+                              hc:InfoElement.TitlePlacement="Left" 
+                              Style="{StaticResource ComboBoxExtend}"
+                              SelectedIndex="{Binding ShowMode,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+                        <ComboBoxItem Content="原图显示"/>
+                        <ComboBoxItem Content="定位画面"/>
+                        <ComboBoxItem Content="高频画面"/>
+                        <ComboBoxItem Content="中频画面"/>
+                        <ComboBoxItem Content="低频画面"/>
+                        <ComboBoxItem Content="组合画面"/>
+                    </ComboBox>
+
+                    <TabControl>
+                        <TabItem Header="定位">
+                            <StackPanel>
+                                <!--灰度阈值-->
+                                <hc:NumericUpDown hc:InfoElement.Title="灰度阈值"
+                                              hc:InfoElement.TitleWidth="140"
+                                              hc:InfoElement.Placeholder="123" 
+                                              hc:InfoElement.TitlePlacement="Left" 
+                                              Minimum="0"
+                                              Maximum="255"
+                                              Value="{Binding LocThresh,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                              Style="{StaticResource NumericUpDownPlus}"
+                                              Margin="5"/>
+                                <!--面积上限-->
+                                <hc:NumericUpDown hc:InfoElement.Title="面积上限"
+                                              hc:InfoElement.TitleWidth="140"
+                                              hc:InfoElement.Placeholder="123" 
+                                              hc:InfoElement.TitlePlacement="Left" 
+                                              Value="{Binding MaxRadius,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                              Minimum="{Binding MinRadius,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                              Style="{StaticResource NumericUpDownPlus}"
+                                              Margin="5"/>
+                                <!--面积下限-->
+                                <hc:NumericUpDown hc:InfoElement.Title="面积下限"
+                                              hc:InfoElement.TitleWidth="140"
+                                              hc:InfoElement.Placeholder="123" 
+                                              hc:InfoElement.TitlePlacement="Left" 
+                                              Maximum="{Binding MaxRadius,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                              Value="{Binding MinRadius,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                              Style="{StaticResource NumericUpDownPlus}"
+                                              Margin="5"/>
+
+                            </StackPanel>
+                        </TabItem>
+
+                        <TabItem Header="ROI">
+                            <StackPanel>
+                                <!--镜片外径-->
+                                <hc:NumericUpDown hc:InfoElement.Title="镜片外径"
+                                              hc:InfoElement.TitleWidth="140"
+                                              hc:InfoElement.Placeholder="123" 
+                                              hc:InfoElement.TitlePlacement="Left" 
+                                              Value="{Binding LensRadius,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                              Style="{StaticResource NumericUpDownPlus}"
+                                              Margin="5"/>
+                                <!--通孔外径-->
+                                <hc:NumericUpDown hc:InfoElement.Title="通孔外径"
+                                              hc:InfoElement.TitleWidth="140"
+                                              hc:InfoElement.Placeholder="123" 
+                                              hc:InfoElement.TitlePlacement="Left" 
+                                              Value="{Binding HoleRadius,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                              Style="{StaticResource NumericUpDownPlus}"
+                                              Margin="5"/>
+
+                                <!--自动屏蔽-->
+                                <ComboBox Margin="5"
+                                          hc:InfoElement.Title="自动屏蔽" 
+                                          hc:InfoElement.TitleWidth="140" 
+                                          hc:InfoElement.TitlePlacement="Left" 
+                                          Style="{StaticResource ComboBoxExtend}"
+                                          SelectedIndex="{Binding AutoCover,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+                                    <ComboBoxItem Content="启用"/>
+                                    <ComboBoxItem Content="关闭"/>
+                                </ComboBox>
+
+                                <!--屏蔽区域外径-->
+                                <hc:NumericUpDown hc:InfoElement.Title="屏蔽区域外径"
+                                                  hc:InfoElement.TitleWidth="140"
+                                                  hc:InfoElement.Placeholder="123" 
+                                                  hc:InfoElement.TitlePlacement="Left" 
+                                                  Value="{Binding CoverRadiusMax,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                                  Minimum="{Binding CoverRadiusMin,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                                  Style="{StaticResource NumericUpDownPlus}"
+                                                  Margin="5">
+                                    <hc:NumericUpDown.Visibility>
+                                        <MultiBinding Converter="{StaticResource CACG_Conv}">
+                                            <Binding Path="AutoCover" />
+                                            <Binding Path="CommboxID[1]" />
+                                        </MultiBinding>
+                                    </hc:NumericUpDown.Visibility>
+                                </hc:NumericUpDown>
+
+                                <!--屏蔽区域内径-->
+                                <hc:NumericUpDown hc:InfoElement.Title="屏蔽区域内径"
+                                              hc:InfoElement.TitleWidth="140"
+                                              hc:InfoElement.Placeholder="123" 
+                                              hc:InfoElement.TitlePlacement="Left" 
+                                              Value="{Binding CoverRadiusMin,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                              Maximum="{Binding CoverRadiusMax,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                              Style="{StaticResource NumericUpDownPlus}"
+                                              Margin="5">
+                                    <hc:NumericUpDown.Visibility>
+                                        <MultiBinding Converter="{StaticResource CACG_Conv}">
+                                            <Binding Path="AutoCover" />
+                                            <Binding Path="CommboxID[1]" />
+                                        </MultiBinding>
+                                    </hc:NumericUpDown.Visibility>
+                                </hc:NumericUpDown>
+
+                            </StackPanel>
+                        </TabItem>
+
+                        <TabItem Header="灰度规格">
+                            <StackPanel>
+                                <!--灰度上限-->
+                                <hc:NumericUpDown hc:InfoElement.Title="灰度上限"
+                                              hc:InfoElement.TitleWidth="140"
+                                              hc:InfoElement.Placeholder="123" 
+                                              hc:InfoElement.TitlePlacement="Left" 
+                                              Maximum="255"
+                                              Minimum="{Binding LowCut,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                              Value="{Binding HighCut,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                              Style="{StaticResource NumericUpDownPlus}"
+                                              Margin="5"/>
+                                <!--灰度下限-->
+                                <hc:NumericUpDown hc:InfoElement.Title="灰度下限"
+                                              hc:InfoElement.TitleWidth="140"
+                                              hc:InfoElement.Placeholder="123" 
+                                              hc:InfoElement.TitlePlacement="Left" 
+                                              Minimum="0"
+                                              Maximum="{Binding HighCut,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                              Value="{Binding LowCut,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                              Style="{StaticResource NumericUpDownPlus}"
+                                              Margin="5"/>
+
+                            </StackPanel>
+                        </TabItem>
+
+                        <TabItem Header="尺寸规格">
+                            <StackPanel>
+                                <!--小型脏污尺寸-->
+                                <hc:NumericUpDown hc:InfoElement.Title="小型脏污尺寸"
+                                              hc:InfoElement.TitleWidth="140"
+                                              hc:InfoElement.Placeholder="123" 
+                                              hc:InfoElement.TitlePlacement="Left" 
+                                              Minimum="0"
+                                              Value="{Binding sSize,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                              Style="{StaticResource NumericUpDownPlus}"
+                                              Margin="5"/>
+
+                                <!--中型脏污尺寸-->
+                                <hc:NumericUpDown hc:InfoElement.Title="中型脏污尺寸"
+                                              hc:InfoElement.TitleWidth="140"
+                                              hc:InfoElement.Placeholder="123" 
+                                              hc:InfoElement.TitlePlacement="Left" 
+                                              Minimum="{Binding sSize,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                              Value="{Binding mSize,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                              Style="{StaticResource NumericUpDownPlus}"
+                                              Margin="5"/>
+
+                                <!--大型脏污尺寸-->
+                                <hc:NumericUpDown hc:InfoElement.Title="大型脏污尺寸"
+                                              hc:InfoElement.TitleWidth="140"
+                                              hc:InfoElement.Placeholder="123" 
+                                              hc:InfoElement.TitlePlacement="Left" 
+                                              Minimum="{Binding mSize,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                              Value="{Binding lSize,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                              Style="{StaticResource NumericUpDownPlus}"
+                                              Margin="5"/>
+
+                            </StackPanel>
+                        </TabItem>
+
+                    </TabControl>
+
+                </StackPanel>
+
+                
             </StackPanel>
         </ScrollViewer>
     </Viewbox>

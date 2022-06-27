@@ -147,6 +147,12 @@ namespace 滤光片点胶
         {
             camParamViewModel.HiKCamera.TriggerMode();
             IsCamOn[SeletedCam] = camParamViewModel.HiKCamera.isTrigger;
+
+            // 切换触发模式时需要释放缓存
+            if (camParamViewModel.HiKCamera.isTrigger)
+            {
+                camParamViewModel.stp.Cancel();
+            }
         }
 
         /// <summary>
@@ -197,6 +203,7 @@ namespace 滤光片点胶
                 {
                     IsCamOn[i] = false;
                 }
+                MultiView.DictPanel[i].CamVM.stp.Cancel();
             }
 
             IsCamOn[MultiView.DictPanel.Count] = false;

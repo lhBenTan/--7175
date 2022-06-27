@@ -208,8 +208,12 @@ namespace 滤光片点胶
                 if (clientSocket != null && clientSocket.Connected)
                 {
                     clientSocket.Send(buf);
-                    
+
                     WriteLine("信息发送成功：" + Encoding.UTF8.GetString(buf, 0, buf.Length), "Green");
+                }
+                else
+                {
+                    WriteLine("信息发送失败：" + Encoding.UTF8.GetString(buf, 0, buf.Length), "Red");
                 }
             }
             catch
@@ -247,7 +251,7 @@ namespace 滤光片点胶
             }
             catch
             {
-                Growl.Error("服务器开启失败");
+                Growl.Info("监听线程退出");
             }
         }
 

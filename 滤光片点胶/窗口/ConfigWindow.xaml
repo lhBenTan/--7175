@@ -11,7 +11,7 @@
         ResizeMode="NoResize"
         Topmost="True"
         mc:Ignorable="d"
-        Title="参数配置界面" Height="600" Width="400">
+        Title="参数配置界面" Height="650" Width="400">
     <Grid>
         <local:CameraConfig VerticalAlignment="Top" Margin="5"/>
     </Grid>

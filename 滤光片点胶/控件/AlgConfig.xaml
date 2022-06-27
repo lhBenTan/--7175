@@ -6,7 +6,7 @@
              xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns:local="clr-namespace:滤光片点胶"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="300">
+             d:DesignHeight="500" d:DesignWidth="300">
     <UserControl.Resources>
         <local:CACG_Conv x:Key="CACG_Conv"/>
     </UserControl.Resources>
@@ -26,9 +26,9 @@
             <ComboBox Grid.Column="1"
                       SelectedIndex="{Binding SelectedAlg, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" >
                 <ComboBoxItem Content="识别算法1" />
-                <ComboBoxItem Content="识别算法2" />
-                <ComboBoxItem Content="识别算法3 - 滤光片识别" />
-                <ComboBoxItem Content="识别算法4 - 镜筒识别" />
+                <!--<ComboBoxItem Content="识别算法2" />-->
+                <!--<ComboBoxItem Content="识别算法3 - 滤光片识别" />-->
+                <!--<ComboBoxItem Content="识别算法4 - 镜筒识别" />-->
             </ComboBox>
         </Grid>
 
@@ -41,14 +41,14 @@
             </local:_7175_Alg_1.Visibility>
         </local:_7175_Alg_1>
 
-        <local:_7175_Alg_2>
-            <local:_7175_Alg_2.Visibility>
+        <local:_7175_Alg_1>
+            <local:_7175_Alg_1.Visibility>
                 <MultiBinding Converter="{StaticResource CACG_Conv}">
                     <Binding Path="SelectedAlg" />
                     <Binding Path="CommboxID[1]" />
                 </MultiBinding>
-            </local:_7175_Alg_2.Visibility>
-        </local:_7175_Alg_2>
+            </local:_7175_Alg_1.Visibility>
+        </local:_7175_Alg_1>
 
         <local:_7175_Alg_3>
             <local:_7175_Alg_3.Visibility>
@@ -67,5 +67,6 @@
                 </MultiBinding>
             </local:_7175_Alg_4.Visibility>
         </local:_7175_Alg_4>
+
     </StackPanel>
 </UserControl>

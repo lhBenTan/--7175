@@ -229,7 +229,7 @@ namespace 滤光片点胶
                 return nRet;
             }
             GC.KeepAlive(pCallBackFunc);
-
+            
             nRet = device.MV_CC_StartGrabbing_NET();
             if (MyCamera.MV_OK != nRet)
             {
@@ -239,12 +239,12 @@ namespace 滤光片点胶
                 Growl.Error(err);
                 return nRet;
             }
-
+            
             ////软触发
             nRet += device.MV_CC_SetEnumValue_NET("TriggerMode", (uint)1);
             nRet += device.MV_CC_SetEnumValue_NET("TriggerSource", 7);
             //nRet += device.MV_CC_SetBoolValue_NET("TriggerCacheEnable", true);
-            //nRet += device.MV_CC_SetFloatValue_NET("AcquisitionFrameRate", (float)2);
+            //nRet += device.MV_CC_SetFloatValue_NET("AcquisitionFrameRate", (float)10);
             nRet += device.MV_CC_SetIntValue_NET("GevHeartbeatTimeout", (uint)500);//心跳时间
             if (MyCamera.MV_OK != nRet)
             {
@@ -302,11 +302,11 @@ namespace 滤光片点胶
             device.MV_CC_GetTriggerMode_NET(ref mode);
 
             nRet += device.MV_CC_SetEnumValue_NET("TriggerMode", (uint)(1 - mode.nCurValue));
+            nRet += device.MV_CC_ClearImageBuffer_NET();
 
             if (MyCamera.MV_OK != nRet)
             {
                 err = String.Format("触发模式开启失败,错误码:{0:X}\n", nRet);
-
                 Growl.Error(err);
             }
             else

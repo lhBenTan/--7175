@@ -72,6 +72,36 @@ namespace 滤光片点胶
                 classEle = new XElement("MinRadius", 0);
                 rootEle.Add(classEle);
 
+                classEle = new XElement("LensRadius", 0);
+                rootEle.Add(classEle);
+
+                classEle = new XElement("HoleRadius", 0);
+                rootEle.Add(classEle);
+                //AutoCover
+                classEle = new XElement("AutoCover", 0);
+                rootEle.Add(classEle);
+
+                classEle = new XElement("CoverRadiusMax", 0);
+                rootEle.Add(classEle);
+
+                classEle = new XElement("CoverRadiusMin", 0);
+                rootEle.Add(classEle);
+
+                classEle = new XElement("HighCut", 0);
+                rootEle.Add(classEle);
+
+                classEle = new XElement("LowCut", 0);
+                rootEle.Add(classEle);
+
+                classEle = new XElement("sSize", 0);
+                rootEle.Add(classEle);
+
+                classEle = new XElement("mSize", 0);
+                rootEle.Add(classEle);
+
+                classEle = new XElement("lSize", 0);
+                rootEle.Add(classEle);
+                
                 classEle = new XElement("Radius", 128);
                 rootEle.Add(classEle);
 
@@ -210,6 +240,23 @@ namespace 滤光片点胶
                     R_max = int.Parse(Config.Descendants("R_max").ElementAt(0).Value);
                     G_max = int.Parse(Config.Descendants("G_max").ElementAt(0).Value);
                     B_max = int.Parse(Config.Descendants("B_max").ElementAt(0).Value);
+
+                    //ROI设置
+                    LensRadius = int.Parse(Config.Descendants("LensRadius").ElementAt(0).Value);
+                    HoleRadius = int.Parse(Config.Descendants("HoleRadius").ElementAt(0).Value);
+                    //AutoCover
+                    AutoCover = int.Parse(Config.Descendants("AutoCover").ElementAt(0).Value);
+                    CoverRadiusMax = int.Parse(Config.Descendants("CoverRadiusMax").ElementAt(0).Value);
+                    CoverRadiusMin = int.Parse(Config.Descendants("CoverRadiusMin").ElementAt(0).Value);
+
+                    //差分图切片阈值
+                    HighCut = int.Parse(Config.Descendants("HighCut").ElementAt(0).Value);
+                    LowCut = int.Parse(Config.Descendants("LowCut").ElementAt(0).Value);
+
+                    //脏污点尺寸
+                    sSize = int.Parse(Config.Descendants("sSize").ElementAt(0).Value);
+                    mSize = int.Parse(Config.Descendants("mSize").ElementAt(0).Value);
+                    lSize = int.Parse(Config.Descendants("lSize").ElementAt(0).Value);
 
                 }
                 catch (Exception err)
@@ -662,6 +709,146 @@ namespace 滤光片点胶
             {
                 XDocument config = XDocument.Load(filePath);
                 config.Descendants("D2sizeMin").ElementAt(0).SetValue(value);
+                config.Save(filePath);
+            });
+        }
+
+        /// <summary>
+        ///镜片半径
+        /// </summary>
+        public int LensRadius
+        {
+            get => GetProperty(() => LensRadius);
+            set => SetProperty(() => LensRadius, value, () =>
+            {
+                XDocument config = XDocument.Load(filePath);
+                config.Descendants("LensRadius").ElementAt(0).SetValue(value);
+                config.Save(filePath);
+            });
+        }
+
+        /// <summary>
+        ///通孔半径
+        /// </summary>
+        public int HoleRadius
+        {
+            get => GetProperty(() => HoleRadius);
+            set => SetProperty(() => HoleRadius, value, () =>
+            {
+                XDocument config = XDocument.Load(filePath);
+                config.Descendants("HoleRadius").ElementAt(0).SetValue(value);
+                config.Save(filePath);
+            });
+        }
+
+        /// <summary>
+        /// 自动屏蔽
+        /// </summary>
+        public int AutoCover
+        {
+            get => GetProperty(() => AutoCover);
+            set => SetProperty(() => AutoCover, value, () =>
+            {
+                XDocument config = XDocument.Load(filePath);
+                config.Descendants("AutoCover").ElementAt(0).SetValue(value);
+                config.Save(filePath);
+            });
+        }
+
+        /// <summary>
+        /// 屏蔽区外边缘
+        /// </summary>
+        public int CoverRadiusMax
+        {
+            get => GetProperty(() => CoverRadiusMax);
+            set => SetProperty(() => CoverRadiusMax, value, () =>
+            {
+                XDocument config = XDocument.Load(filePath);
+                config.Descendants("CoverRadiusMax").ElementAt(0).SetValue(value);
+                config.Save(filePath);
+            });
+        }
+
+        /// <summary>
+        /// 屏蔽区内边缘
+        /// </summary>
+        public int CoverRadiusMin
+        {
+            get => GetProperty(() => CoverRadiusMin);
+            set => SetProperty(() => CoverRadiusMin, value, () =>
+            {
+                XDocument config = XDocument.Load(filePath);
+                config.Descendants("CoverRadiusMin").ElementAt(0).SetValue(value);
+                config.Save(filePath);
+            });
+        }
+
+        /// <summary>
+        /// 差分切片上限
+        /// </summary>
+        public int HighCut
+        {
+            get => GetProperty(() => HighCut);
+            set => SetProperty(() => HighCut, value, () =>
+            {
+                XDocument config = XDocument.Load(filePath);
+                config.Descendants("HighCut").ElementAt(0).SetValue(value);
+                config.Save(filePath);
+            });
+        }
+
+        /// <summary>
+        /// 差分切片下限
+        /// </summary>
+        public int LowCut
+        {
+            get => GetProperty(() => LowCut);
+            set => SetProperty(() => LowCut, value, () =>
+            {
+                XDocument config = XDocument.Load(filePath);
+                config.Descendants("LowCut").ElementAt(0).SetValue(value);
+                config.Save(filePath);
+            });
+        }
+
+        /// <summary>
+        /// 微型脏污尺寸
+        /// </summary>
+        public int sSize
+        {
+            get => GetProperty(() => sSize);
+            set => SetProperty(() => sSize, value, () =>
+            {
+                XDocument config = XDocument.Load(filePath);
+                config.Descendants("sSize").ElementAt(0).SetValue(value);
+                config.Save(filePath);
+            });
+        }
+
+        /// <summary>
+        /// 中型脏污尺寸
+        /// </summary>
+        public int mSize
+        {
+            get => GetProperty(() => mSize);
+            set => SetProperty(() => mSize, value, () =>
+            {
+                XDocument config = XDocument.Load(filePath);
+                config.Descendants("mSize").ElementAt(0).SetValue(value);
+                config.Save(filePath);
+            });
+        }
+
+        /// <summary>
+        /// 大型脏污尺寸
+        /// </summary>
+        public int lSize
+        {
+            get => GetProperty(() => lSize);
+            set => SetProperty(() => lSize, value, () =>
+            {
+                XDocument config = XDocument.Load(filePath);
+                config.Descendants("lSize").ElementAt(0).SetValue(value);
                 config.Save(filePath);
             });
         }

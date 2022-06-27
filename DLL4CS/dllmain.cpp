@@ -1,5 +1,6 @@
 ﻿// dllmain.cpp : 定义 DLL 应用程序的入口点。
 #include "pch.h"
+#include "Filter.h"
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
@@ -33,7 +34,9 @@ struct BmpBuf
 
 };
 
-#include "Filter.h"
+void ErrOutput(BmpBuf &data, char** input_Parameter, float* output_Parameter_Float);
+
+#pragma region 外观检测
 
 void DirtyTestG1R1(BmpBuf &data, char** input_Parameter, float* output_Parameter_Float)
 {
@@ -569,6 +572,307 @@ void DirtyTestP2R1(BmpBuf &data, char** input_Parameter, float* output_Parameter
 #pragma endregion
 }
 
+int DirtyG2R1(Mat src, Mat& dst, char** input_Parameter, float* output_Parameter_Float)
+{
+#pragma region 本地参数
+
+	double _area = -1;
+	int maxL = -1, num;
+	stringstream outStr;
+	vector<Vec4i> hierarchy;
+	vector<vector<Point2i>> contours;
+	int  Dnum1 = 0, Dnum2 = 0, Dnum3 = 0;
+	Mat temp, Polared, toBlur, Blured, Diff, DePolared;
+	Mat mask, ROI, high, median, low, labels, stats, centroids;
+
+#pragma endregion
+
+#pragma region 参数载入
+	//显示模式
+	int ShowMode = stoi(input_Parameter[0]);
+
+	// 定位参数
+	int LocThresh = stoi(input_Parameter[1]);
+	int MaxRadius = stoi(input_Parameter[2]);
+	int MinRadius = stoi(input_Parameter[3]);
+
+	//ROI设置
+	int LensRadius = stoi(input_Parameter[4]);
+	int HoleRadius = stoi(input_Parameter[5]);
+
+	int AutoCover = stoi(input_Parameter[6]);
+	int CoverRadiusMax = stoi(input_Parameter[7]);
+	int CoverRadiusMin = stoi(input_Parameter[8]);
+
+	//差分图切片阈值
+	int HighCut = stoi(input_Parameter[9]);
+	int LowCut = stoi(input_Parameter[10]);
+
+	//脏污点尺寸
+	int sSize = stoi(input_Parameter[11]);
+	int mSize = stoi(input_Parameter[12]);
+	int lSize = stoi(input_Parameter[13]);
+#pragma endregion
+
+#pragma region 圆心定位
+	threshold(src, temp, LocThresh, 255, THRESH_BINARY);
+	findContours(temp, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_NONE, Point(0, 0));
+
+	if (ShowMode == 1)cvtColor(temp, dst, CV_GRAY2BGR);
+
+std:sort(contours.begin(), contours.end(), [](vector<Point2i> a, vector<Point2i> b) {
+	if (6 < a.size() && 6 < a.size())
+	{
+		return contourArea(a) > contourArea(b);
+	}
+	return false;
+});
+
+	for (size_t i = 0; i < contours.size(); i++)
+	{
+		vector<Point2i> tmpCont;
+		convexHull(contours[i], tmpCont);
+		double tmpArea = contourArea(tmpCont, 0);
+		if (tmpArea > CV_PI*MaxRadius*MaxRadius)continue;
+		if (tmpArea < CV_PI*MinRadius*MinRadius)break;
+		if (tmpArea > _area)
+		{
+			_area = (long)tmpArea;
+			maxL = i;
+		}
+	}
+
+	if (maxL < 0)
+	{
+		stringstream str;
+		str << "未找到镜头" << endl;
+		putTextZH(dst, str.str().c_str(), Point(10, 10), Scalar(0, 0, 255), 60, "黑体", 0);
+		output_Parameter_Float[0] = 0;
+		return 0;
+	}
+
+	//输出圆心坐标
+	RotatedRect ell = fitEllipse(contours[maxL]);
+	ellipse(dst, ell, Scalar(255, 0, 0), 2);
+
+	try
+	{
+		if (AutoCover == 0)
+		{
+			RotatedRect ellex = fitEllipse(contours[maxL + 1]);
+			CoverRadiusMax = ell.size.width / 2;
+			CoverRadiusMin = ellex.size.width / 2;
+		}
+	}
+	catch (const std::exception&)
+	{
+
+	}
+	
+	
+	circle(dst, ell.center, CoverRadiusMax, Scalar(0, 0, 255));
+	circle(dst, ell.center, CoverRadiusMin, Scalar(0, 0, 255));
+
+	circle(dst, ell.center, MaxRadius, Scalar(0, 255, 0));
+	circle(dst, ell.center, MinRadius, Scalar(0, 255, 0));
+
+	circle(dst, ell.center, LensRadius, Scalar(0, 255, 255));
+	circle(dst, ell.center, HoleRadius, Scalar(0, 255, 255));
+
+	outStr << "圆心坐标:(" << ell.center.x << "," << ell.center.x << ")" << endl;
+	outStr << "半径:" << ell.size.width / 2 << endl;
+#pragma endregion
+
+#pragma region 图像预处理
+	warpPolar(src, Polared, Size(LensRadius, LensRadius * 2 * CV_PI), ell.center, LensRadius, WARP_POLAR_LINEAR);
+
+	toBlur = Polared;
+	GaussianBlur(toBlur, Blured, Size(5, 201), 0);
+
+	//absdiff(toBlur, Blured, Diff);
+	Diff = toBlur - Blured;
+
+	//按区域进行放大
+	Diff(Rect(0, 0, HoleRadius, LensRadius * 2 * CV_PI)) *= 7;
+	Diff(Rect(HoleRadius + 1, 0, LensRadius - HoleRadius - 1, LensRadius * 2 * CV_PI)) *= 4;
+
+	rectangle(Diff, Point(CoverRadiusMin, 0), Point(CoverRadiusMax, LensRadius * 2 * CV_PI), Scalar(0), -1);
+
+	warpPolar(Diff, DePolared, src.size(), ell.center, LensRadius, WARP_INVERSE_MAP);
+
+	mask = Mat::zeros(DePolared.size(), DePolared.type());
+	circle(mask, ell.center, LensRadius - 1, Scalar(255), -1);
+
+	DePolared.copyTo(ROI, mask);
+#pragma endregion
+
+#pragma region 特征图提取
+
+	threshold(ROI, high, HighCut, 255, THRESH_TOZERO);
+
+	threshold(ROI, median, HighCut + 20, 255, THRESH_TOZERO_INV);
+	threshold(median, median, LowCut, HighCut + 20, THRESH_BINARY);
+
+	threshold(ROI, low, LowCut + 10, 255, THRESH_TOZERO_INV);
+	threshold(low, low, 0, LowCut + 10, THRESH_TOZERO);
+
+
+	if (ShowMode == 2)cvtColor(high, dst, CV_GRAY2BGR);
+	if (ShowMode == 3)cvtColor(median, dst, CV_GRAY2BGR);
+	if (ShowMode == 4)cvtColor(low, dst, CV_GRAY2BGR);
+#pragma endregion
+
+#pragma region 特征加强
+	Mat kernel = getStructuringElement(MORPH_CROSS, Size(7, 7));
+	cv::morphologyEx(high, high, MORPH_DILATE, kernel);
+
+	//kernel = getStructuringElement(MORPH_CROSS, Size(3, 3));
+	//cv::morphologyEx(median, median, MORPH_DILATE, kernel);
+
+	//kernel = getStructuringElement(MORPH_ELLIPSE, Size(5, 5));
+	//cv::morphologyEx(low, low, MORPH_DILATE, kernel);
+
+	vector<Mat> channels;
+	Mat _temp;
+	channels.push_back(low);
+	channels.push_back(median);
+	channels.push_back(high);
+
+	merge(channels, _temp);
+
+	Mat YUV;
+	cvtColor(_temp, YUV, CV_RGB2YUV);
+
+	Scalar Low = Scalar(20, 0, 0), High = Scalar(255, 255, 255);
+	inRange(YUV, Low, High, mask);
+
+	if (ShowMode == 5)cvtColor(mask, dst, CV_GRAY2BGR);
+#pragma endregion
+
+#pragma region 连通域筛选
+	num = connectedComponentsWithStats(high, labels, stats, centroids);
+	for (size_t i = 1; i < num; i++)
+	{
+		int x = stats.at<int>(i, CC_STAT_LEFT);
+		int y = stats.at<int>(i, CC_STAT_TOP);
+		int w = stats.at<int>(i, CC_STAT_WIDTH);
+		int h = stats.at<int>(i, CC_STAT_HEIGHT);
+		int a = stats.at<int>(i, CC_STAT_AREA);
+
+		Point2f p1 = Point2f(centroids.at<double>(i, 0), centroids.at<double>(i, 1));
+		Point2f p2 = ell.center;
+
+		Rect rect(x, y, w, h);
+
+
+		if (HoleRadius > sqrtf(powf((p1.x - p2.x), 2) + powf((p1.y - p2.y), 2)) && a < sSize)
+		{
+			rectangle(dst, rect, Scalar(0, 0, 255), 2, 8, 0);
+			Dnum1++;
+		}
+		else if (HoleRadius > sqrtf(powf((p1.x - p2.x), 2) + powf((p1.y - p2.y), 2)) && a > sSize)
+		{
+			rectangle(dst, rect, Scalar(255, 128, 0), 2, 8, 0);
+			Dnum2++;
+		}
+
+		if (a > lSize)
+		{
+
+			rectangle(dst, rect, Scalar(255, 0, 128), 2, 8, 0);
+			Dnum3++;
+		}
+	}
+
+	num = connectedComponentsWithStats(median, labels, stats, centroids);
+	for (size_t i = 1; i < num; i++)
+	{
+		int x = stats.at<int>(i, CC_STAT_LEFT);
+		int y = stats.at<int>(i, CC_STAT_TOP);
+		int w = stats.at<int>(i, CC_STAT_WIDTH);
+		int h = stats.at<int>(i, CC_STAT_HEIGHT);
+		int a = stats.at<int>(i, CC_STAT_AREA);
+
+		if (a > mSize)
+		{
+			Rect rect(x, y, w, h);
+			rectangle(dst, rect, Scalar(255, 128, 0), 2, 8, 0);
+			Dnum2++;
+		}
+	}
+
+	num = connectedComponentsWithStats(mask, labels, stats, centroids);
+	for (size_t i = 1; i < num; i++)
+	{
+		int x = stats.at<int>(i, CC_STAT_LEFT);
+		int y = stats.at<int>(i, CC_STAT_TOP);
+		int w = stats.at<int>(i, CC_STAT_WIDTH);
+		int h = stats.at<int>(i, CC_STAT_HEIGHT);
+		int a = stats.at<int>(i, CC_STAT_AREA);
+
+		if (a > lSize)
+		{
+			Rect rect(x, y, w, h);
+			rectangle(dst, rect, Scalar(255, 0, 128), 2, 8, 0);
+			Dnum3++;
+		}
+	}
+
+
+	//这里可以再优化一下，将全部可疑点输出至同一幅画面，再进行筛选，这样脏污数目统计更为准确
+#pragma endregion
+
+#pragma region 结果输出
+	outStr << "内环脏污数:" << Dnum1 << endl;
+	outStr << "中型脏污数:" << Dnum2 << endl;
+	outStr << "大型脏污数:" << Dnum3 << endl;
+
+	//以下数量需与技术检讨
+	if (Dnum1 < 3 && Dnum2 < 1 && Dnum3 < 1)
+	{
+		putTextZH(dst, outStr.str().c_str(), Point(10, 10), Scalar(0, 255, 0), 60, "黑体", 0);
+		output_Parameter_Float[0] = 1;
+		return	1;
+	}
+
+	putTextZH(dst, outStr.str().c_str(), Point(10, 10), Scalar(0, 0, 255), 60, "黑体", 0);
+	output_Parameter_Float[0] = 0;
+	return 0;
+#pragma endregion
+
+}
+
+void DirtyTest(BmpBuf &data, char** input_Parameter, float* output_Parameter_Float)
+{
+	Mat src, dst;
+	Mat input = Mat(data.h, data.w, CV_8UC1, data.data_Input);//默认判胶相机使用的是彩色相机
+	src = input.clone();
+	cvtColor(src, dst, COLOR_GRAY2RGB);
+
+	try
+	{
+		DirtyG2R1(src, dst, input_Parameter, output_Parameter_Float);
+	}
+	catch (const std::exception&)
+	{
+		ErrOutput(data, input_Parameter, output_Parameter_Float);
+		return;
+	}
+
+#pragma region 图片返回
+	int size = dst.total() * dst.elemSize();
+	data.size = size;
+	data.h = dst.rows;
+	data.w = dst.cols;
+
+	data.data_Output = (uchar *)calloc(size, sizeof(uchar));
+	std::memcpy(data.data_Output, dst.data, size * sizeof(BYTE));
+#pragma endregion
+
+}
+
+#pragma endregion
+
 Mat RotateImage(Mat src, double angle)
 {
 	Mat dst;
@@ -589,6 +893,8 @@ Mat RotateImage(Mat src, double angle)
 
 	return dst;
 }
+
+#pragma region 滤光片检测
 
 void IRtest(BmpBuf &data, char** input_Parameter, float* output_Parameter_Float)
 {
@@ -1159,6 +1465,8 @@ void HDtest(BmpBuf &data, char** input_Parameter, float* output_Parameter_Float)
 #pragma endregion
 }
 
+#pragma endregion
+
 void ErrOutput(BmpBuf &data, char** input_Parameter, float* output_Parameter_Float)
 {
 	//Mat src = Mat(data.h, data.w, CV_8UC1, data.data_Input);//默认非点胶后相机提供的原始图像为黑白图像
@@ -1222,8 +1530,8 @@ bool MV_EntryPoint(int type, BmpBuf &data, char** input_Parameter, float* output
 	{
 		switch (type)
 		{
-		case 0: DirtyTestG1R1(data, input_Parameter, output_Parameter_Float); break;
-		case 1: DirtyTestP2R1(data, input_Parameter, output_Parameter_Float); break;
+		case 0: DirtyTest(data, input_Parameter, output_Parameter_Float); break;
+		case 1: DirtyTest(data, input_Parameter, output_Parameter_Float); break;
 		case 2:	IRtest(data, input_Parameter, output_Parameter_Float); break;
 		case 3:	HDtest(data, input_Parameter, output_Parameter_Float); break;
 

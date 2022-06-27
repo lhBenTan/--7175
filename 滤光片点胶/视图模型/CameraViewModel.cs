@@ -131,20 +131,26 @@ namespace 滤光片点胶
 
         public void Connect()
         {
-            if (!MainViewModel.isOneServer)
+            ///这里需要在优化
+            if (HiKCamera.Connect(SelectedCam) == 0)
             {
-                mySocket.Listen();
+                if (!MainViewModel.isOneServer)
+                {
+                    mySocket.Listen();
+                }
             }
-            HiKCamera.Connect(SelectedCam);
+
+            
         }
 
         public void Disconnect()
         {
+            HiKCamera.Disconnect();
             if (!MainViewModel.isOneServer && mySocket != null)
             {
                 mySocket.StopListen();
             }
-            HiKCamera.Disconnect();
+            
         }
 
         #endregion
@@ -181,26 +187,40 @@ namespace 滤光片点胶
 
                 if (ParamsVMs[AlgNum].SelectedAlg < 2)
                 {
-                    inParam[0] = ParamsVMs[AlgNum].ShowMode.ToString();
+                    inParam[0] = ParamsVMs[AlgNum].ShowMode.ToString();//showmode
 
-                    inParam[1] = ParamsVMs[AlgNum].LocThresh.ToString();
-                    inParam[2] = ParamsVMs[AlgNum].MaxRadius.ToString();
-                    inParam[3] = ParamsVMs[AlgNum].MinRadius.ToString();
+                    inParam[1] = ParamsVMs[AlgNum].LocThresh.ToString();//LocThresh
+                    inParam[2] = ParamsVMs[AlgNum].MaxRadius.ToString();//MaxRadius
+                    inParam[3] = ParamsVMs[AlgNum].MinRadius.ToString();//MinRadius
 
-                    inParam[4] = ParamsVMs[AlgNum].Radius.ToString();
-                    inParam[5] = ParamsVMs[AlgNum].nMaxRadius.ToString();
-                    inParam[6] = ParamsVMs[AlgNum].nMinRadius.ToString();
+                    //inParam[4] = ParamsVMs[AlgNum].Radius.ToString();
+                    //inParam[5] = ParamsVMs[AlgNum].nMaxRadius.ToString();//LensRadius
+                    //inParam[6] = ParamsVMs[AlgNum].nMinRadius.ToString();//HoleRadius
 
-                    inParam[7] = ParamsVMs[AlgNum].D1thresh.ToString();
-                    inParam[8] = ParamsVMs[AlgNum].D1SizeMax.ToString();
-                    inParam[9] = ParamsVMs[AlgNum].D1SizeMin.ToString();
+                    //inParam[7] = ParamsVMs[AlgNum].D1thresh.ToString();
+                    //inParam[8] = ParamsVMs[AlgNum].D1SizeMax.ToString();
+                    //inParam[9] = ParamsVMs[AlgNum].D1SizeMin.ToString();
 
-                    inParam[10] = ParamsVMs[AlgNum].D2AdapSize.ToString();
-                    inParam[11] = ParamsVMs[AlgNum].D2AdapC.ToString();
-                    inParam[12] = ParamsVMs[AlgNum].D2RoundnessMin.ToString();
-                    inParam[13] = ParamsVMs[AlgNum].D2RectangularityMin.ToString();
-                    inParam[14] = ParamsVMs[AlgNum].D2sizeMax.ToString();
-                    inParam[15] = ParamsVMs[AlgNum].D2sizeMin.ToString();
+                    //inParam[10] = ParamsVMs[AlgNum].D2AdapSize.ToString();
+                    //inParam[11] = ParamsVMs[AlgNum].D2AdapC.ToString();
+                    //inParam[12] = ParamsVMs[AlgNum].D2RoundnessMin.ToString();
+                    //inParam[13] = ParamsVMs[AlgNum].D2RectangularityMin.ToString();
+                    //inParam[14] = ParamsVMs[AlgNum].D2sizeMax.ToString();
+                    //inParam[15] = ParamsVMs[AlgNum].D2sizeMin.ToString();
+
+                    inParam[4] = ParamsVMs[AlgNum].LensRadius.ToString();
+                    inParam[5] = ParamsVMs[AlgNum].HoleRadius.ToString();
+
+                    inParam[6] = ParamsVMs[AlgNum].AutoCover.ToString();
+                    inParam[7] = ParamsVMs[AlgNum].CoverRadiusMax.ToString();
+                    inParam[8] = ParamsVMs[AlgNum].CoverRadiusMin.ToString();
+
+                    inParam[9] = ParamsVMs[AlgNum].HighCut.ToString();
+                    inParam[10] = ParamsVMs[AlgNum].LowCut.ToString();
+
+                    inParam[11] = ParamsVMs[AlgNum].sSize.ToString();
+                    inParam[12] = ParamsVMs[AlgNum].mSize.ToString();
+                    inParam[13] = ParamsVMs[AlgNum].lSize.ToString();
                 }
                 else
                 {
@@ -290,9 +310,7 @@ namespace 滤光片点胶
                     //    MV_OnSendMess?.Invoke(this, "F");
                     //}
                 }
-
-
-
+                
                 //显示
                 Application.Current.Dispatcher.Invoke(() =>
                 {
@@ -341,7 +359,7 @@ namespace 滤光片点胶
         /// <summary>
         /// 智能线程池，用于处理回调图像算法
         /// </summary>
-        private SmartThreadPool stp;
+        public SmartThreadPool stp;
 
         #endregion
 
